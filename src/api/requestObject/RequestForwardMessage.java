@@ -10,11 +10,19 @@ public class RequestForwardMessage {
     private Message message;
     private Chat chat;
 
-    public RequestForwardMessage(){}
+    public RequestForwardMessage() {
+    }
 
-    public RequestForwardMessage(Message message, Chat chat){
-        this.message = message;
+    public RequestForwardMessage(Chat chat, Message message) {
         this.chat = chat;
+        this.message = message;
+    }
+
+    public RequestForwardMessage(Object chatId, Object fromChatId, int messageId) {
+        this.chat = new Chat(chatId);
+        this.message = new Message();
+        this.message.setChat(new Chat(fromChatId));
+        this.message.setMessageId(messageId);
     }
 
     public Message getMessage() {

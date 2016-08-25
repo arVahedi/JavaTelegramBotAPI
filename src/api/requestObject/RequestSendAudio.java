@@ -3,11 +3,12 @@ package api.requestObject;
 import api.entity.*;
 
 /**
- * Created by Gladiator on 1/23/2016 AD.
+ * Created by Gladiator on 2/6/2016 AD.
  */
-public class RequestSendLocation {
+public class RequestSendAudio {
     private Chat chat;
-    private Location location;
+    private Audio audio;
+    private InputFile inputFile;
     private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
@@ -15,17 +16,24 @@ public class RequestSendLocation {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendLocation() {
-    }
+    public RequestSendAudio(){}
 
-    public RequestSendLocation(Chat chat, Location location) {
+    public RequestSendAudio(Chat chat, Audio audio){
         this.chat = chat;
-        this.location = location;
+        this.audio = audio;
     }
 
-    public RequestSendLocation(Object chatId, double latitude, double longitude) {
+    public RequestSendAudio(Object chatId, Audio audio){
         this.chat = new Chat(chatId);
-        this.location = new Location(longitude, latitude);
+        this.audio = audio;
+    }
+
+    public Audio getAudio() {
+        return audio;
+    }
+
+    public void setAudio(Audio audio) {
+        this.audio = audio;
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -38,13 +46,12 @@ public class RequestSendLocation {
         }
     }
 
-    public Object getReplyMarkup() {
-        if (this.replyKeyboardMarkup != null) {
+    public Object getReplyMarkup(){
+        if (this.replyKeyboardMarkup != null){
             return this.replyKeyboardMarkup;
-        }
-        if (this.replyKeyboardHide != null) {
+        }if (this.replyKeyboardHide != null){
             return this.replyKeyboardHide;
-        } else {
+        }else {
             return this.forceReply;
         }
     }
@@ -57,14 +64,6 @@ public class RequestSendLocation {
         this.chat = chat;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
     public int getReplyToMessageId() {
         return replyToMessageId;
     }
@@ -72,4 +71,13 @@ public class RequestSendLocation {
     public void setReplyToMessageId(int replyToMessageId) {
         this.replyToMessageId = replyToMessageId;
     }
+
+    public InputFile getInputFile() {
+        return inputFile;
+    }
+
+    public void setInputFile(InputFile inputFile) {
+        this.inputFile = inputFile;
+    }
+
 }

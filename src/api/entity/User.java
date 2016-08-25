@@ -6,6 +6,11 @@ public class User {
     private String first_name;
     private String last_name;
 
+    public User(){}
+
+    public User(int id){
+        this.id = id;
+    }
 
     public int getId() {
         return id;

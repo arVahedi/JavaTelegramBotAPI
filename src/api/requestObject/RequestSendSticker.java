@@ -3,11 +3,13 @@ package api.requestObject;
 import api.entity.*;
 
 /**
- * Created by Gladiator on 1/23/2016 AD.
+ * Created by Gladiator on 2/25/2016 AD.
  */
-public class RequestSendLocation {
+public class RequestSendSticker {
     private Chat chat;
-    private Location location;
+    private Sticker sticker;
+    private InputFile inputFile;
+    private boolean disableNotification = false;
     private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
@@ -15,17 +17,17 @@ public class RequestSendLocation {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendLocation() {
+    public RequestSendSticker() {
     }
 
-    public RequestSendLocation(Chat chat, Location location) {
+    public RequestSendSticker(Chat chat, Sticker sticker) {
         this.chat = chat;
-        this.location = location;
+        this.sticker = sticker;
     }
 
-    public RequestSendLocation(Object chatId, double latitude, double longitude) {
+    public RequestSendSticker(Object chatId, Sticker sticker) {
         this.chat = new Chat(chatId);
-        this.location = new Location(longitude, latitude);
+        this.sticker = sticker;
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -57,12 +59,28 @@ public class RequestSendLocation {
         this.chat = chat;
     }
 
-    public Location getLocation() {
-        return location;
+    public Sticker getSticker() {
+        return sticker;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setSticker(Sticker sticker) {
+        this.sticker = sticker;
+    }
+
+    public InputFile getInputFile() {
+        return inputFile;
+    }
+
+    public void setInputFile(InputFile inputFile) {
+        this.inputFile = inputFile;
+    }
+
+    public boolean isDisableNotification() {
+        return disableNotification;
+    }
+
+    public void setDisableNotification(boolean disableNotification) {
+        this.disableNotification = disableNotification;
     }
 
     public int getReplyToMessageId() {

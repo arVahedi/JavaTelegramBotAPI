@@ -1,34 +1,43 @@
 package api.core;
 
+import api.entity.File;
 import api.entity.Message;
 import api.entity.User;
-import api.exception.ForwardMessageException;
-import api.exception.SendLocationException;
-import api.exception.SendMessageException;
+import api.entity.UserProfilePhoto;
+import api.exception.*;
 import api.json.JSONObject;
 import api.net.SSLConnection;
-import api.requestObject.RequestForwardMessage;
-import api.requestObject.RequestSendLocation;
-import api.requestObject.RequestSendMessage;
+import api.requestObject.*;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Bot {
     private String id;
     private String username;
-    private String token;
+    private static String token;
+
+    private static Bot instance = null;
 
     private static String apiUrl = "https://api.telegram.org/bot";
 
-    public Bot(String token) {
-        this.token = token;
+    private Bot(String token) {
+        Bot.token = token;
+    }
+
+    public static Bot getInstance() {
+        if (instance == null) {
+            instance = new Bot(token);
+        }
+
+        return instance;
     }
 
     public User getMe() throws IOException {
-        String getMeUrl = apiUrl + this.token + "/getMe";
+        String getMeUrl = apiUrl + token + "/getMe";
         SSLConnection sslConnection = new SSLConnection(getMeUrl);
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
@@ -43,8 +52,28 @@ public class Bot {
         return user;
     }
 
-    public List<Message> getUpdates() throws IOException {
-        String updateUrl = apiUrl + this.token + "/getUpdates";
+    public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
+        String updateUrl = apiUrl + token + "/getUpdates?";
+
+        if (requestGetUpdate.getOffset() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl = updateUrl + "&";
+            }
+            updateUrl = updateUrl + "offset=" + requestGetUpdate.getOffset();
+        }
+        if (requestGetUpdate.getLimit() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl = updateUrl + "&";
+            }
+            updateUrl = updateUrl + "limit=" + requestGetUpdate.getLimit();
+        }
+        if (requestGetUpdate.getTimeout() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl = updateUrl + "&";
+            }
+            updateUrl = updateUrl + "timeout=" + requestGetUpdate.getTimeout();
+        }
+
         SSLConnection sslConnection = new SSLConnection(updateUrl);
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
@@ -55,17 +84,29 @@ public class Bot {
             for (int counter = 0; counter < jsonResponse.getJSONArray("result").length(); counter++) {
                 Message message = gson.fromJson(jsonResponse.getJSONArray("result").getJSONObject(counter).get("message").toString()
                         , Message.class);
+                message.setUpdateId((Integer) jsonResponse.getJSONArray("result").getJSONObject(counter).get("update_id"));
                 listOfAllMessage.add(message);
             }
         } else {
-            //TODO: write exception for error in response from telegram;
+            //TODO: write telegram error message in exception;
+            throw new GetUpdateException();
         }
 
         return listOfAllMessage;
     }
 
     public void forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
-        String forwardUrl = apiUrl + this.token + "/forwardMessage?chat_id=" + requestForwardMessage.getChat().getId()
+
+        String chatId;
+        if (requestForwardMessage.getChat().getId() != 0) {
+            chatId = String.valueOf(requestForwardMessage.getChat().getId());
+        } else if (requestForwardMessage.getChat().getUsername() != null) {
+            chatId = requestForwardMessage.getChat().getUsername();
+        } else {
+            throw new ForwardMessageException("Chat id or chat username is null");
+        }
+
+        String forwardUrl = apiUrl + this.token + "/forwardMessage?chat_id=" + chatId
                 + "&from_chat_id=" + requestForwardMessage.getMessage().getChat().getId()
                 + "&message_id=" + requestForwardMessage.getMessage().getMessageId();
         SSLConnection sslConnection = new SSLConnection(forwardUrl);
@@ -81,12 +122,14 @@ public class Bot {
         String chatId;
         if (requestSendMessage.getChat().getId() != 0) {
             chatId = String.valueOf(requestSendMessage.getChat().getId());
+        } else if (requestSendMessage.getChat().getUsername() != null) {
+            chatId = requestSendMessage.getChat().getUsername();
         } else {
-            chatId = "@" + requestSendMessage.getChat().getUsername();
+            throw new SendMessageException("Chat id or chat username is null");
         }
 
-        String sendMessageUrl = apiUrl + this.token + "/sendMessage?chat_id=" + chatId
-                + "&text=" + requestSendMessage.getText();
+        String sendMessageUrl = apiUrl + token + "/sendMessage?chat_id=" + chatId
+                + "&text=" + URLEncoder.encode(requestSendMessage.getText(), "UTF-8");
 
         if (requestSendMessage.getParseMode() != null) {
             sendMessageUrl = sendMessageUrl + "&parse_mode=" + requestSendMessage.getParseMode();
@@ -111,11 +154,13 @@ public class Bot {
         String chatId;
         if (requestSendLocation.getChat().getId() != 0) {
             chatId = String.valueOf(requestSendLocation.getChat().getId());
+        } else if (requestSendLocation.getChat().getUsername() != null) {
+            chatId = requestSendLocation.getChat().getUsername();
         } else {
-            chatId = "@" + requestSendLocation.getChat().getUsername();
+            throw new SendLocationException("Chat id or chat username is null");
         }
 
-        String sendLocationUrl = apiUrl + this.token + "/sendLocation?chat_id=" + chatId
+        String sendLocationUrl = apiUrl + token + "/sendLocation?chat_id=" + chatId
                 + "&latitude=" + requestSendLocation.getLocation().getLatitude()
                 + "&longitude=" + requestSendLocation.getLocation().getLongitude();
 
@@ -132,6 +177,349 @@ public class Bot {
         }
     }
 
+    public void sendChatAction(RequestSendChatAction requestSendChatAction) {
+        String chatId;
+        if (requestSendChatAction.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendChatAction.getChat().getId());
+        } else if (requestSendChatAction.getChat().getUsername() != null) {
+            chatId = requestSendChatAction.getChat().getUsername();
+        } else {
+            throw new SendChatActionException("Chat id or chat username is null");
+        }
+
+        String sendChatActionUrl = apiUrl + token + "/sendChatAction?chat_id=" + chatId
+                + "&action=" + requestSendChatAction.getAction();
+
+        SSLConnection sslConnection = new SSLConnection(sendChatActionUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+    }
+
+    public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
+        String getUserProfilePhotoUrl = apiUrl + token + "/getUserProfilePhotos?user_id="
+                + requestGetUserProfilePhotos.getUser().getId();
+
+        if (requestGetUserProfilePhotos.getLimit() != 0) {
+            getUserProfilePhotoUrl = getUserProfilePhotoUrl + "&limit=" + requestGetUserProfilePhotos.getLimit();
+        }
+        if (requestGetUserProfilePhotos.getOffset() != 0) {
+            getUserProfilePhotoUrl = getUserProfilePhotoUrl + "&offset=" + requestGetUserProfilePhotos.getOffset();
+        }
+
+        SSLConnection sslConnection = new SSLConnection(getUserProfilePhotoUrl);
+
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        UserProfilePhoto userProfilePhoto;
+        if ((boolean) jsonResponse.get("ok")) {
+            Gson gson = new Gson();
+            userProfilePhoto = gson.fromJson(jsonResponse.get("result").toString(), UserProfilePhoto.class);
+        } else {
+            //TODO: write telegram error message exception;
+            throw new GetUserProfilePhotosException();
+        }
+
+        return userProfilePhoto;
+    }
+
+    public File getFile(RequestGetFile requestGetFile) throws IOException {
+        String getFileUrl = apiUrl + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
+
+        SSLConnection sslConnection = new SSLConnection(getFileUrl);
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        File file;
+        if ((boolean) jsonResponse.get("ok")) {
+            Gson gson = new Gson();
+            file = gson.fromJson(jsonResponse.get("result").toString(), File.class);
+        } else {
+            //TODO: write telegram error message exception;
+            throw new GetFileException();
+        }
+
+        return file;
+    }
+
+    public void sendAudio(RequestSendAudio requestSendAudio) {
+        String chatId;
+        if (requestSendAudio.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendAudio.getChat().getId());
+        } else if (requestSendAudio.getChat().getUsername() != null) {
+            chatId = requestSendAudio.getChat().getUsername();
+        } else {
+            throw new SendAudioException("Chat id or chat username is null");
+        }
+
+        String audioId;
+        if (requestSendAudio.getAudio().getFileId() != null) {
+            audioId = requestSendAudio.getAudio().getFileId();
+        } else if (requestSendAudio.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            audioId = "";
+        } else {
+            throw new SendAudioException("Audio id or input file is null");
+        }
+
+        String sendAudioUrl = apiUrl + token + "/sendAudio?chat_id=" + chatId
+                + "&audio=" + audioId;
+
+        if (requestSendAudio.getAudio().getDuration() != 0) {
+            sendAudioUrl = sendAudioUrl + "&duration=" + requestSendAudio.getAudio().getDuration();
+        }
+
+        if (requestSendAudio.getAudio().getPerformer() != null) {
+            sendAudioUrl = sendAudioUrl + "&performer=" + requestSendAudio.getAudio().getPerformer();
+        }
+
+        if (requestSendAudio.getAudio().getTitle() != null) {
+            sendAudioUrl = sendAudioUrl + "&title=" + requestSendAudio.getAudio().getTitle();
+        }
+
+        if (requestSendAudio.getReplyToMessageId() != 0) {
+            sendAudioUrl = sendAudioUrl + "&reply_to_message_id=" + requestSendAudio.getReplyToMessageId();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendAudioUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+
+    }
+
+    public void sendDocument(RequestSendDocument requestSendDocument) {
+        String chatId;
+        if (requestSendDocument.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendDocument.getChat().getId());
+        } else if (requestSendDocument.getChat().getUsername() != null) {
+            chatId = requestSendDocument.getChat().getUsername();
+        } else {
+            throw new SendDocumentException("Chat id or chat username is null");
+        }
+
+        String documentId;
+        if (requestSendDocument.getDocument().getFileId() != null) {
+            documentId = requestSendDocument.getDocument().getFileId();
+        } else if (requestSendDocument.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            documentId = "";
+        } else {
+            throw new SendDocumentException("Document id or input file is null");
+        }
+
+        String sendDocumentUrl = apiUrl + token + "/sendDocument?chat_id=" + chatId
+                + "&document=" + documentId + "&disableNotification=" + requestSendDocument.isDisableNotification();
+
+        if (requestSendDocument.getReplyToMessageId() != 0) {
+            sendDocumentUrl = sendDocumentUrl + "&reply_to_message_id=" + requestSendDocument.getReplyToMessageId();
+        }
+
+        if (requestSendDocument.getCaption() != null) {
+            sendDocumentUrl = sendDocumentUrl + "&caption=" + requestSendDocument.getCaption();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendDocumentUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+
+    }
+
+    public void sendSticker(RequestSendSticker requestSendSticker) {
+        String chatId;
+        if (requestSendSticker.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendSticker.getChat().getId());
+        } else if (requestSendSticker.getChat().getUsername() != null) {
+            chatId = requestSendSticker.getChat().getUsername();
+        } else {
+            throw new SendStickerException("Chat id or chat username is null");
+        }
+
+        String stickerId;
+        if (requestSendSticker.getSticker().getFileId() != null) {
+            stickerId = requestSendSticker.getSticker().getFileId();
+        } else if (requestSendSticker.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            stickerId = "";
+        } else {
+            throw new SendStickerException("Sticker id or input file is null");
+        }
+
+        String sendStickerUrl = apiUrl + token + "/sendSticker?chat_id=" + chatId
+                + "&sticker=" + stickerId + "&disableNotification=" + requestSendSticker.isDisableNotification();
+
+        if (requestSendSticker.getReplyToMessageId() != 0) {
+            sendStickerUrl = sendStickerUrl + "&reply_to_message_id=" + requestSendSticker.getReplyToMessageId();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendStickerUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+
+    }
+
+    public void sendVideo(RequestSendVideo requestSendVideo) {
+        String chatId;
+        if (requestSendVideo.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendVideo.getChat().getId());
+        } else if (requestSendVideo.getChat().getUsername() != null) {
+            chatId = requestSendVideo.getChat().getUsername();
+        } else {
+            throw new SendVoiceException("Chat id or chat username is null");
+        }
+
+        String videoId;
+        if (requestSendVideo.getVideo().getFileId() != null) {
+            videoId = requestSendVideo.getVideo().getFileId();
+        } else if (requestSendVideo.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            videoId = "";
+        } else {
+            throw new SendVoiceException("Video id or input file is null");
+        }
+
+        String sendVideoUrl = apiUrl + token + "/sendVideo?chat_id=" + chatId
+                + "&video=" + videoId + "&disableNotification=" + requestSendVideo.isDisableNotification();
+
+        if (requestSendVideo.getReplyToMessageId() != 0) {
+            sendVideoUrl = sendVideoUrl + "&reply_to_message_id=" + requestSendVideo.getReplyToMessageId();
+        }
+
+        if (requestSendVideo.getCaption() != null) {
+            sendVideoUrl = sendVideoUrl + "&caption=" + requestSendVideo.getCaption();
+        }
+
+        if (requestSendVideo.getVideo().getDuration() != 0) {
+            sendVideoUrl = sendVideoUrl + "&duration=" + requestSendVideo.getVideo().getDuration();
+        }
+
+        if (requestSendVideo.getVideo().getWidth() != 0) {
+            sendVideoUrl = sendVideoUrl + "&width=" + requestSendVideo.getVideo().getWidth();
+        }
+
+        if (requestSendVideo.getVideo().getHeight() != 0) {
+            sendVideoUrl = sendVideoUrl + "&height=" + requestSendVideo.getVideo().getHeight();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendVideoUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+    }
+
+    public void sendVoice(RequestSendVoice requestSendVoice) {
+        String chatId;
+        if (requestSendVoice.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendVoice.getChat().getId());
+        } else if (requestSendVoice.getChat().getUsername() != null) {
+            chatId = requestSendVoice.getChat().getUsername();
+        } else {
+            throw new SendVoiceException("Chat id or chat username is null");
+        }
+
+        String voiceId;
+        if (requestSendVoice.getVoice().getFileId() != null) {
+            voiceId = requestSendVoice.getVoice().getFileId();
+        } else if (requestSendVoice.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            voiceId = "";
+        } else {
+            throw new SendVoiceException("Voice id or input file is null");
+        }
+
+        String sendVoiceUrl = apiUrl + token + "/sendVoice?chat_id=" + chatId
+                + "&voice=" + voiceId + "&disableNotification=" + requestSendVoice.isDisableNotification();
+
+        if (requestSendVoice.getReplyToMessageId() != 0) {
+            sendVoiceUrl = sendVoiceUrl + "&reply_to_message_id=" + requestSendVoice.getReplyToMessageId();
+        }
+
+        if (requestSendVoice.getVoice().getDuration() != 0) {
+            sendVoiceUrl = sendVoiceUrl + "&duration=" + requestSendVoice.getVoice().getDuration();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendVoiceUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+    }
+
+    public void sendPhoto(RequestSendPhoto requestSendPhoto) {
+        String chatId;
+        if (requestSendPhoto.getChat().getId() != 0) {
+            chatId = String.valueOf(requestSendPhoto.getChat().getId());
+        } else if (requestSendPhoto.getChat().getUsername() != null) {
+            chatId = requestSendPhoto.getChat().getUsername();
+        } else {
+            throw new SendPhotoException("Chat id or chat username is null");
+        }
+
+        String photoId;
+        if (requestSendPhoto.getPhoto().getFileId() != null) {
+            photoId = requestSendPhoto.getPhoto().getFileId();
+        } else if (requestSendPhoto.getInputFile() != null) {
+            // TODO: how to send input file via multipart-form-data
+            photoId = "";
+        } else {
+            throw new SendPhotoException("Photo id or input file is null");
+        }
+
+        String sendPhotoUrl = apiUrl + token + "/sendPhoto?chat_id=" + chatId
+                + "&photo=" + photoId + "&disableNotification=" + requestSendPhoto.isDisableNotification();
+
+        if (requestSendPhoto.getReplyToMessage() != null) {
+            sendPhotoUrl = sendPhotoUrl + "&reply_to_message_id=" + requestSendPhoto.getReplyToMessage().getMessageId();
+        }
+
+        if (requestSendPhoto.getCaption() != null) {
+            sendPhotoUrl = sendPhotoUrl + "&caption=" + requestSendPhoto.getCaption();
+        }
+
+        //TODO: add replyMarkup support;
+
+        SSLConnection sslConnection = new SSLConnection(sendPhotoUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+    }
+
+    public void setWebHook(RequestSetWebHook requestSetWebHook) {
+        //TODO: add input file for certificate file;
+        String setWebHookUrl = apiUrl + token + "/setWebhook?url=" + requestSetWebHook.getUrl() +
+                "&certificate=" + "";
+
+        SSLConnection sslConnection = new SSLConnection(setWebHookUrl);
+        try {
+            JSONObject jsonObject = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+    }
 
     //TODO: other method for bot telegram entity;
 
@@ -151,11 +539,11 @@ public class Bot {
         this.username = username;
     }
 
-    public String getToken() {
-        return token;
+    public static String getToken() {
+        return Bot.token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public static void setToken(String token) {
+        Bot.token = token;
     }
 }

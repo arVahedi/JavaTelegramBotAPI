@@ -32,6 +32,8 @@ public class Message {
     private int migrate_to_chat_id;
     private int migrate_from_chat_id;
 
+    private int updateId;
+
     public int getMessageId() {
         return message_id;
     }
@@ -246,5 +248,13 @@ public class Message {
 
     public void setMigrate_from_chat_id(int migrate_from_chat_id) {
         this.migrate_from_chat_id = migrate_from_chat_id;
+    }
+
+    public int getUpdateId() {
+        return updateId;
+    }
+
+    public void setUpdateId(int updateId) {
+        this.updateId = updateId;
     }
 }

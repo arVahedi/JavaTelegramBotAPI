@@ -8,6 +8,13 @@ public class Audio {
     private String mime_type;
     private int file_size;
 
+    public Audio() {
+    }
+
+    public Audio(String file_id) {
+        this.file_id = file_id;
+    }
+
     public String getFileId() {
         return file_id;
     }
@@ -55,4 +62,5 @@ public class Audio {
     public void setFileSize(int fileSize) {
         this.file_size = fileSize;
     }
+
 }

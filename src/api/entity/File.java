@@ -5,6 +5,12 @@ public class File {
     private int file_size;
     private String file_path;
 
+    public File(){}
+
+    public File(String fileId){
+        this.file_id = fileId;
+    }
+
     public String getFile_id() {
         return file_id;
     }

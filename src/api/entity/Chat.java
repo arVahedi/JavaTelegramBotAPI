@@ -8,10 +8,27 @@ public class Chat {
     private String first_name;
     private String last_name;
 
-    public Chat(){}
+    public Chat() {
+    }
 
-    public Chat(int id){
+    public Chat(int id) {
         this.id = id;
+    }
+
+    public Chat(String username) {
+        this.username = username;
+    }
+
+    public Chat(Object id) {
+        if (id instanceof Integer) {
+            this.id = (int) id;
+        } else if (id instanceof String) {
+            if (((String) id).startsWith("@")) {
+                this.username = String.valueOf(id);
+            } else {
+                this.username = "@" + String.valueOf(id);
+            }
+        }
     }
 
     public int getId() {
