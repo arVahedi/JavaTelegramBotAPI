@@ -107,4 +107,5 @@ public class RequestSendPhoto {
     public void setReplyToMessage(Message replyToMessage) {
         this.replyToMessage = replyToMessage;
     }
+
 }

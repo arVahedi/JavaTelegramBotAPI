@@ -7,6 +7,7 @@ import api.entity.UserProfilePhoto;
 import api.exception.*;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
+import api.net.MultipartFormData;
 import api.net.SSLConnection;
 import api.requestobject.*;
 import api.utilities.JsonUtil;
@@ -15,10 +16,10 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
- *
  * Created by Gladiator on 8/26/2016 AD.
  */
 public class Bot implements BotInterface {
@@ -60,7 +61,7 @@ public class Bot implements BotInterface {
             Gson gson = new Gson();
             user = gson.fromJson(jsonResponse.get("result").toString(), User.class);
         } else {
-           throw new GetMeException("Illegal response.");
+            throw new GetMeException("Illegal response.");
         }
 
         return user;
@@ -77,12 +78,10 @@ public class Bot implements BotInterface {
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
         String chatId;
-        if (requestSendMessage.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendMessage.getChat().getId());
-        } else if (requestSendMessage.getChat().getUsername() != null) {
-            chatId = requestSendMessage.getChat().getUsername();
+        if (requestSendMessage.getChat().isValid()) {
+            chatId = requestSendMessage.getChat().getChatId();
         } else {
-            throw new SendMessageException("Chat id or chat username is null");
+            throw new SendPhotoException("Chat id or chat username is null");
         }
 
         String sendMessageUrl = API_URL + token + "/sendMessage?chat_id=" + chatId
@@ -98,7 +97,7 @@ public class Bot implements BotInterface {
         if (requestSendMessage.getReplyToMessageId() != 0) {
             sendMessageUrl = sendMessageUrl + "&reply_to_message_id=" + requestSendMessage.getReplyToMessageId();
         }
-        if (requestSendMessage.getReplyMarkup() != null){
+        if (requestSendMessage.getReplyMarkup() != null) {
             sendMessageUrl += "&reply_markup=" + JsonUtil.toJsonSerializable(requestSendMessage.getReplyMarkup());
         }
 
@@ -108,7 +107,7 @@ public class Bot implements BotInterface {
             if ((boolean) jsonResponse.get("ok")) {
                 Message message = (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
                 return message;
-            }else{
+            } else {
                 throw new SendMessageException("Illegal response.");
             }
         } catch (Exception e) {
@@ -128,12 +127,10 @@ public class Bot implements BotInterface {
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
 
         String chatId;
-        if (requestForwardMessage.getChat().getId() != 0) {
-            chatId = String.valueOf(requestForwardMessage.getChat().getId());
-        } else if (requestForwardMessage.getChat().getUsername() != null) {
-            chatId = requestForwardMessage.getChat().getUsername();
+        if (requestForwardMessage.getChat().isValid()) {
+            chatId = requestForwardMessage.getChat().getChatId();
         } else {
-            throw new ForwardMessageException("Chat id or chat username is null");
+            throw new SendPhotoException("Chat id or chat username is null");
         }
 
         String forwardUrl = API_URL + this.token + "/forwardMessage?chat_id=" + chatId
@@ -146,7 +143,7 @@ public class Bot implements BotInterface {
             if ((boolean) jsonResponse.get("ok")) {
                 Message message = (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
                 return message;
-            }else{
+            } else {
                 throw new ForwardMessageException("Illegal Response.");
             }
         } catch (Exception e) {
@@ -155,53 +152,70 @@ public class Bot implements BotInterface {
 
     }
 
-    public Message sendPhoto(RequestSendPhoto requestSendPhoto) {
+    /**
+     * Use this method to send photos. On success, the sent Message is returned.
+     *
+     * @param requestSendPhoto Request send photo
+     *
+     * @return send Message is returned.
+     *
+     * @throws IOException
+     */
+    public Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendPhoto?");
+        HashMap<String, String> attributes = new HashMap<>();
+
         String chatId;
-        if (requestSendPhoto.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendPhoto.getChat().getId());
-        } else if (requestSendPhoto.getChat().getUsername() != null) {
-            chatId = requestSendPhoto.getChat().getUsername();
+        if (requestSendPhoto.getChat().isValid()) {
+            chatId = requestSendPhoto.getChat().getChatId();
         } else {
             throw new SendPhotoException("Chat id or chat username is null");
         }
 
-        String photoId;
-        if (requestSendPhoto.getPhoto().getFileId() != null) {
-            photoId = requestSendPhoto.getPhoto().getFileId();
-        } else if (requestSendPhoto.getInputFile() != null) {
-            // TODO: how to send input file via multipart-form-data
-            photoId = "";
+        if (requestSendPhoto.getReplyToMessage() != null) {
+            attributes.put("reply_to_message_id=", String.valueOf(requestSendPhoto.getReplyToMessage().getMessageId()));
+        }
+
+        if (requestSendPhoto.getCaption() != null) {
+            attributes.put("caption=", requestSendPhoto.getCaption());
+        }
+
+        // TODO: 8/29/2016 AD check this attribute to work.
+        if (requestSendPhoto.getReplyMarkup() != null) {
+            attributes.put("reply_markup=", JsonUtil.toJsonSerializable(requestSendPhoto.getReplyMarkup()));
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendPhoto.isDisableNotification()));
+
+        if (requestSendPhoto.getPhoto() != null) {      // We don't upload file. Using photo_id instead.
+            attributes.put("photo", requestSendPhoto.getPhoto().getFileId());
+            urlBuilder.append("chat_id=" + chatId);
+            attributes.forEach((key, value) -> urlBuilder.append("&" + key + "=" + value));
+            SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+            try {
+                JSONObject jsonResponse = sslConnection.getSSLConnection();
+                if ((boolean) jsonResponse.get("ok")) {
+                    Message message = (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+                    return message;
+                } else {
+                    throw new ForwardMessageException("Illegal Response.");
+                }
+            } catch (Exception e) {
+                throw new SendChatActionException(e.getMessage());
+            }
+        } else if (requestSendPhoto.getInputFile() != null) {       // We are uploading photo file.
+            attributes.put("chat_id", chatId);
+            HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+            fileMap.put("photo", new java.io.File(requestSendPhoto.getInputFile().getPath()));
+            MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+            multipartFormData.initialize();
+            multipartFormData.send();
+            // TODO: 8/29/2016 AD get return message and return that instead null.
+            return null;
         } else {
             throw new SendPhotoException("Photo id or input file is null");
         }
 
-        String sendPhotoUrl = API_URL + token + "/sendPhoto?chat_id=" + chatId
-                + "&photo=" + photoId + "&disableNotification=" + requestSendPhoto.isDisableNotification();
-
-        if (requestSendPhoto.getReplyToMessage() != null) {
-            sendPhotoUrl = sendPhotoUrl + "&reply_to_message_id=" + requestSendPhoto.getReplyToMessage().getMessageId();
-        }
-
-        if (requestSendPhoto.getCaption() != null) {
-            sendPhotoUrl = sendPhotoUrl + "&caption=" + requestSendPhoto.getCaption();
-        }
-
-        if (requestSendPhoto.getReplyMarkup() != null){
-            sendPhotoUrl += "&reply_markup=" + JsonUtil.toJsonSerializable(requestSendPhoto.getReplyMarkup());
-        }
-
-        SSLConnection sslConnection = new SSLConnection(sendPhotoUrl);
-        try {
-            JSONObject jsonResponse = sslConnection.getSSLConnection();
-            if ((boolean) jsonResponse.get("ok")) {
-                Message message = (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
-                return message;
-            }else{
-                throw new ForwardMessageException("Illegal Response.");
-            }
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {

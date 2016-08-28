@@ -80,4 +80,18 @@ public class Chat implements Serializable {
     public void setLast_name(String last_name) {
         this.last_name = last_name;
     }
+
+    public String getChatId(){
+        if (this.id != 0){
+            return String.valueOf(this.id);
+        }else if (this.username != null){
+            return this.username;
+        }
+
+        return null;
+    }
+
+    public boolean isValid(){
+        return this.id != 0 || this.username != null;
+    }
 }
