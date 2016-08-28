@@ -1,4 +1,6 @@
 package api.entity;
 
-public class Update {
+import java.io.Serializable;
+
+public class Update implements Serializable {
 }

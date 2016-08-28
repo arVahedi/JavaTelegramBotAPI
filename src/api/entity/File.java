@@ -1,13 +1,16 @@
 package api.entity;
 
-public class File {
+import java.io.Serializable;
+
+public class File implements Serializable {
     private String file_id;
     private int file_size;
     private String file_path;
 
-    public File(){}
+    public File() {
+    }
 
-    public File(String fileId){
+    public File(String fileId) {
         this.file_id = fileId;
     }
 

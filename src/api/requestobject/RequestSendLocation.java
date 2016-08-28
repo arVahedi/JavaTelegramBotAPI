@@ -1,15 +1,13 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.*;
 
 /**
- * Created by Gladiator on 2/25/2016 AD.
+ * Created by Gladiator on 1/23/2016 AD.
  */
-public class RequestSendVoice {
+public class RequestSendLocation {
     private Chat chat;
-    private Voice voice;
-    private InputFile inputFile;
-    private boolean disableNotification = false;
+    private Location location;
     private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
@@ -17,17 +15,17 @@ public class RequestSendVoice {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendVoice() {
+    public RequestSendLocation() {
     }
 
-    public RequestSendVoice(Chat chat, Voice voice) {
+    public RequestSendLocation(Chat chat, Location location) {
         this.chat = chat;
-        this.voice = voice;
+        this.location = location;
     }
 
-    public RequestSendVoice(Object chatId, Voice voice) {
+    public RequestSendLocation(Object chatId, double latitude, double longitude) {
         this.chat = new Chat(chatId);
-        this.voice = voice;
+        this.location = new Location(longitude, latitude);
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -59,28 +57,12 @@ public class RequestSendVoice {
         this.chat = chat;
     }
 
-    public Voice getVoice() {
-        return voice;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setVoice(Voice voice) {
-        this.voice = voice;
-    }
-
-    public InputFile getInputFile() {
-        return inputFile;
-    }
-
-    public void setInputFile(InputFile inputFile) {
-        this.inputFile = inputFile;
-    }
-
-    public boolean isDisableNotification() {
-        return disableNotification;
-    }
-
-    public void setDisableNotification(boolean disableNotification) {
-        this.disableNotification = disableNotification;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public int getReplyToMessageId() {

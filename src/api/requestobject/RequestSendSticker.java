@@ -1,34 +1,33 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.*;
 
 /**
- * Created by Gladiator on 2/4/2016 AD.
+ * Created by Gladiator on 2/25/2016 AD.
  */
-public class RequestSendPhoto {
+public class RequestSendSticker {
     private Chat chat;
-    private PhotoSize photo;
+    private Sticker sticker;
     private InputFile inputFile;
-    private String caption;
-    private boolean disableNotification;
-    private Message replyToMessage;
+    private boolean disableNotification = false;
+    private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
     private ReplyKeyboardMarkup replyKeyboardMarkup;
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendPhoto() {
+    public RequestSendSticker() {
     }
 
-    public RequestSendPhoto(Chat chat, PhotoSize photo) {
+    public RequestSendSticker(Chat chat, Sticker sticker) {
         this.chat = chat;
-        this.photo = photo;
+        this.sticker = sticker;
     }
 
-    public RequestSendPhoto(Object chatId, PhotoSize photo) {
+    public RequestSendSticker(Object chatId, Sticker sticker) {
         this.chat = new Chat(chatId);
-        this.photo = photo;
+        this.sticker = sticker;
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -60,12 +59,12 @@ public class RequestSendPhoto {
         this.chat = chat;
     }
 
-    public PhotoSize getPhoto() {
-        return photo;
+    public Sticker getSticker() {
+        return sticker;
     }
 
-    public void setPhoto(PhotoSize photo) {
-        this.photo = photo;
+    public void setSticker(Sticker sticker) {
+        this.sticker = sticker;
     }
 
     public InputFile getInputFile() {
@@ -76,14 +75,6 @@ public class RequestSendPhoto {
         this.inputFile = inputFile;
     }
 
-    public String getCaption() {
-        return caption;
-    }
-
-    public void setCaption(String caption) {
-        this.caption = caption;
-    }
-
     public boolean isDisableNotification() {
         return disableNotification;
     }
@@ -92,11 +83,11 @@ public class RequestSendPhoto {
         this.disableNotification = disableNotification;
     }
 
-    public Message getReplyToMessage() {
-        return replyToMessage;
+    public int getReplyToMessageId() {
+        return replyToMessageId;
     }
 
-    public void setReplyToMessage(Message replyToMessage) {
-        this.replyToMessage = replyToMessage;
+    public void setReplyToMessageId(int replyToMessageId) {
+        this.replyToMessageId = replyToMessageId;
     }
 }

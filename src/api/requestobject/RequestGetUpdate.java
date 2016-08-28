@@ -1,4 +1,4 @@
-package api.requestObject;
+package api.requestobject;
 
 /**
  * Created by Gladiator on 2/9/2016 AD.

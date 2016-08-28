@@ -1,26 +1,30 @@
-package api.requestObject;
+package api.requestobject;
 
-import api.entity.Chat;
-import api.entity.ForceReply;
-import api.entity.ReplyKeyboardHide;
-import api.entity.ReplyKeyboardMarkup;
-import com.sun.istack.internal.NotNull;
+import api.entity.*;
 
 /**
  * Created by Gladiator on 1/23/2016 AD.
  */
 public class RequestSendMessage {
+    //region Required Fields
     private Chat chat;
     private String text;
-    private String parseMode;
+    //endregion
+
+    //region Optional Fields
+    private String parseMode; //Markdown or HTML; user ParseModeEnum class.
     private boolean disableWebPagePreview = false;
+    private boolean disableNotification = false;
     private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
+    private InlineKeyboardMarkup inlineKeyboardMarkup;
     private ReplyKeyboardMarkup replyKeyboardMarkup;
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
+    //endregion
 
+    //region Getter and Setter
     public RequestSendMessage() {
     }
 
@@ -77,17 +81,25 @@ public class RequestSendMessage {
             this.replyKeyboardHide = (ReplyKeyboardHide) replyMarkup;
         } else if (replyMarkup instanceof ForceReply) {
             this.forceReply = (ForceReply) replyMarkup;
+        } else if (replyMarkup instanceof InlineKeyboardMarkup){
+            this.inlineKeyboardMarkup = (InlineKeyboardMarkup) replyMarkup;
         }
     }
 
-    public Object getReplyMarkup(){
-        if (this.replyKeyboardMarkup != null){
+    public Object getReplyMarkup() {
+        if (this.replyKeyboardMarkup != null) {
             return this.replyKeyboardMarkup;
-        }if (this.replyKeyboardHide != null){
+        }
+        if (this.replyKeyboardHide != null) {
             return this.replyKeyboardHide;
-        }else {
+        }
+        if (this.inlineKeyboardMarkup != null) {
+            return this.inlineKeyboardMarkup;
+        }
+        if (this.forceReply != null) {
             return this.forceReply;
         }
+        return null;
     }
 
     public Chat getChat() {
@@ -97,4 +109,13 @@ public class RequestSendMessage {
     public void setChat(Chat chat) {
         this.chat = chat;
     }
+
+    public boolean isDisableNotification() {
+        return disableNotification;
+    }
+
+    public void setDisableNotification(boolean disableNotification) {
+        this.disableNotification = disableNotification;
+    }
+    //endregion
 }

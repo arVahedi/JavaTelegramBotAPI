@@ -1,8 +1,22 @@
 package api.entity;
 
-public class ForceReply {
+import java.io.Serializable;
+
+public class ForceReply implements Serializable {
     private boolean force_reply;
     private boolean selective;
+
+    public ForceReply() {
+    }
+
+    public ForceReply(boolean forceReply) {
+        this.force_reply = forceReply;
+    }
+
+    public ForceReply(boolean forceReply, boolean selective) {
+        this.force_reply = forceReply;
+        this.selective = selective;
+    }
 
     public boolean isForceReply() {
         return force_reply;

@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Voice {
+import java.io.Serializable;
+
+public class Voice implements Serializable {
     private String file_id;
     private int duration;
     private String mime_type;

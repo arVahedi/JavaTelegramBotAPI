@@ -1,17 +1,21 @@
 package api.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Message {
+public class Message implements Serializable {
     private int message_id;
     private User from;
     private int date;
     private Chat chat;
     private User forward_from;
+    private Chat forward_from_chat;
     private int forward_date;
     private Message reply_to_message;
+    private int edit_date;
     private String text;
+    private List<MessageEntity> entities = new ArrayList<MessageEntity>();
     private Audio audio;
     private Document document;
     private List<PhotoSize> photo = new ArrayList<PhotoSize>();
@@ -21,8 +25,9 @@ public class Message {
     private String caption;
     private Contact contact;
     private Location location;
-    private User new_chat_participant;
-    private User left_chat_participant;
+    private Venue venue;
+    private User new_chat_member;
+    private User left_chat_member;
     private String new_chat_title;
     private List<PhotoSize> new_chat_photo = new ArrayList<PhotoSize>();
     private boolean delete_chat_photo;
@@ -31,6 +36,7 @@ public class Message {
     private boolean channel_chat_created;
     private int migrate_to_chat_id;
     private int migrate_from_chat_id;
+    private Message pinned_message;
 
     private int updateId;
 
@@ -171,19 +177,19 @@ public class Message {
     }
 
     public User getNewChatParticipant() {
-        return new_chat_participant;
+        return new_chat_member;
     }
 
     public void setNewChatParticipant(User newChatParticipant) {
-        this.new_chat_participant = newChatParticipant;
+        this.new_chat_member = newChatParticipant;
     }
 
     public User getLeftChatParticipant() {
-        return left_chat_participant;
+        return left_chat_member;
     }
 
     public void setLeftChatParticipant(User leftChatParticipant) {
-        this.left_chat_participant = leftChatParticipant;
+        this.left_chat_member = leftChatParticipant;
     }
 
     public String getNewChatTitle() {
@@ -256,5 +262,45 @@ public class Message {
 
     public void setUpdateId(int updateId) {
         this.updateId = updateId;
+    }
+
+    public Chat getForward_from_chat() {
+        return forward_from_chat;
+    }
+
+    public void setForward_from_chat(Chat forward_from_chat) {
+        this.forward_from_chat = forward_from_chat;
+    }
+
+    public int getEdit_date() {
+        return edit_date;
+    }
+
+    public void setEdit_date(int edit_date) {
+        this.edit_date = edit_date;
+    }
+
+    public List<MessageEntity> getEntities() {
+        return entities;
+    }
+
+    public void setEntities(List<MessageEntity> entities) {
+        this.entities = entities;
+    }
+
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
+    }
+
+    public Message getPinned_message() {
+        return pinned_message;
+    }
+
+    public void setPinned_message(Message pinned_message) {
+        this.pinned_message = pinned_message;
     }
 }

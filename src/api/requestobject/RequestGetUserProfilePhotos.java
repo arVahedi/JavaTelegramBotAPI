@@ -1,4 +1,4 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.User;
 

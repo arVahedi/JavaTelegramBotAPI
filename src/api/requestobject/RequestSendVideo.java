@@ -1,13 +1,13 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.*;
 
 /**
  * Created by Gladiator on 2/25/2016 AD.
  */
-public class RequestSendDocument {
+public class RequestSendVideo {
     private Chat chat;
-    private Document document;
+    private Video video;
     private InputFile inputFile;
     private String caption;
     private boolean disableNotification = false;
@@ -18,19 +18,17 @@ public class RequestSendDocument {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendDocument() {
-    }
+    public RequestSendVideo(){}
 
-    public RequestSendDocument(Chat chat, Document document) {
+    public RequestSendVideo(Chat chat, Video video) {
         this.chat = chat;
-        this.document = document;
+        this.video = video;
     }
 
-    public RequestSendDocument(Object chatId, Document document) {
+    public RequestSendVideo(Object chatId, Video video) {
         this.chat = new Chat(chatId);
-        this.document = document;
+        this.video = video;
     }
-
 
     public void setReplyMarkup(Object replyMarkup) {
         if (replyMarkup instanceof ReplyKeyboardMarkup) {
@@ -61,12 +59,12 @@ public class RequestSendDocument {
         this.chat = chat;
     }
 
-    public Document getDocument() {
-        return document;
+    public Video getVideo() {
+        return video;
     }
 
-    public void setDocument(Document document) {
-        this.document = document;
+    public void setVideo(Video video) {
+        this.video = video;
     }
 
     public InputFile getInputFile() {

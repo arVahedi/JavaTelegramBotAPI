@@ -1,9 +1,10 @@
 package api.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserProfilePhoto {
+public class UserProfilePhoto implements Serializable {
     private int total_count;
     private List<List<PhotoSize>> photos = new ArrayList<List<PhotoSize>>();
 

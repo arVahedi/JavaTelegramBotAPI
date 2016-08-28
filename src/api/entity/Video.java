@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Video {
+import java.io.Serializable;
+
+public class Video implements Serializable {
     private String file_id;
     private int width;
     private int height;

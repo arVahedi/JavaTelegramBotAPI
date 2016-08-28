@@ -1,13 +1,13 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.*;
 
 /**
  * Created by Gladiator on 2/25/2016 AD.
  */
-public class RequestSendSticker {
+public class RequestSendVoice {
     private Chat chat;
-    private Sticker sticker;
+    private Voice voice;
     private InputFile inputFile;
     private boolean disableNotification = false;
     private int replyToMessageId;
@@ -17,17 +17,17 @@ public class RequestSendSticker {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendSticker() {
+    public RequestSendVoice() {
     }
 
-    public RequestSendSticker(Chat chat, Sticker sticker) {
+    public RequestSendVoice(Chat chat, Voice voice) {
         this.chat = chat;
-        this.sticker = sticker;
+        this.voice = voice;
     }
 
-    public RequestSendSticker(Object chatId, Sticker sticker) {
+    public RequestSendVoice(Object chatId, Voice voice) {
         this.chat = new Chat(chatId);
-        this.sticker = sticker;
+        this.voice = voice;
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -59,12 +59,12 @@ public class RequestSendSticker {
         this.chat = chat;
     }
 
-    public Sticker getSticker() {
-        return sticker;
+    public Voice getVoice() {
+        return voice;
     }
 
-    public void setSticker(Sticker sticker) {
-        this.sticker = sticker;
+    public void setVoice(Voice voice) {
+        this.voice = voice;
     }
 
     public InputFile getInputFile() {

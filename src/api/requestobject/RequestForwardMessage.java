@@ -1,4 +1,4 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.Chat;
 import api.entity.Message;
@@ -7,9 +7,16 @@ import api.entity.Message;
  * Created by Gladiator on 1/23/2016 AD.
  */
 public class RequestForwardMessage {
+    //region Required Fields
     private Message message;
     private Chat chat;
+    //endregion
 
+    //region Optional Fields
+    private boolean disableNotification = false;
+    //endregion
+
+    //region Constructors
     public RequestForwardMessage() {
     }
 
@@ -24,7 +31,9 @@ public class RequestForwardMessage {
         this.message.setChat(new Chat(fromChatId));
         this.message.setMessageId(messageId);
     }
+    //endregion
 
+    //region Getter and Setter
     public Message getMessage() {
         return message;
     }
@@ -40,4 +49,13 @@ public class RequestForwardMessage {
     public void setChat(Chat chat) {
         this.chat = chat;
     }
+
+    public boolean isDisableNotification() {
+        return disableNotification;
+    }
+
+    public void setDisableNotification(boolean disableNotification) {
+        this.disableNotification = disableNotification;
+    }
+    //endregion
 }

@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Chat {
+import java.io.Serializable;
+
+public class Chat implements Serializable {
     private int id;
     private String type;    //private, group, supergroup, channel;
     private String title;

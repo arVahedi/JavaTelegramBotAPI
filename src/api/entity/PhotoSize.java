@@ -1,6 +1,8 @@
 package api.entity;
 
-public class PhotoSize {
+import java.io.Serializable;
+
+public class PhotoSize implements Serializable {
     private String file_id;
     private int width;
     private int height;

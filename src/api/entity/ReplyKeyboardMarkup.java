@@ -1,9 +1,10 @@
 package api.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReplyKeyboardMarkup {
+public class ReplyKeyboardMarkup implements Serializable {
     private List<List<String>> keyboard = new ArrayList<List<String>>();
     private boolean resize_keyboard;
     private boolean one_time_keyboard;

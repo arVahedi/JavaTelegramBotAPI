@@ -1,33 +1,35 @@
-package api.requestObject;
+package api.requestobject;
 
 import api.entity.*;
 
 /**
- * Created by Gladiator on 2/25/2016 AD.
+ * Created by Gladiator on 2/4/2016 AD.
  */
-public class RequestSendVideo {
+public class RequestSendPhoto {
     private Chat chat;
-    private Video video;
+    private PhotoSize photo;
     private InputFile inputFile;
     private String caption;
-    private boolean disableNotification = false;
-    private int replyToMessageId;
+    private boolean disableNotification;
+    private Message replyToMessage;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
+    private InlineKeyboardMarkup inlineKeyboardMarkup;
     private ReplyKeyboardMarkup replyKeyboardMarkup;
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
 
-    public RequestSendVideo(){}
-
-    public RequestSendVideo(Chat chat, Video video) {
-        this.chat = chat;
-        this.video = video;
+    public RequestSendPhoto() {
     }
 
-    public RequestSendVideo(Object chatId, Video video) {
+    public RequestSendPhoto(Chat chat, PhotoSize photo) {
+        this.chat = chat;
+        this.photo = photo;
+    }
+
+    public RequestSendPhoto(Object chatId, PhotoSize photo) {
         this.chat = new Chat(chatId);
-        this.video = video;
+        this.photo = photo;
     }
 
     public void setReplyMarkup(Object replyMarkup) {
@@ -37,6 +39,8 @@ public class RequestSendVideo {
             this.replyKeyboardHide = (ReplyKeyboardHide) replyMarkup;
         } else if (replyMarkup instanceof ForceReply) {
             this.forceReply = (ForceReply) replyMarkup;
+        } else if (replyMarkup instanceof InlineKeyboardMarkup) {
+            this.inlineKeyboardMarkup = (InlineKeyboardMarkup) replyMarkup;
         }
     }
 
@@ -46,9 +50,14 @@ public class RequestSendVideo {
         }
         if (this.replyKeyboardHide != null) {
             return this.replyKeyboardHide;
-        } else {
+        }
+        if (this.forceReply != null) {
             return this.forceReply;
         }
+        if (this.inlineKeyboardMarkup != null) {
+            return this.inlineKeyboardMarkup;
+        }
+        return null;
     }
 
     public Chat getChat() {
@@ -59,12 +68,12 @@ public class RequestSendVideo {
         this.chat = chat;
     }
 
-    public Video getVideo() {
-        return video;
+    public PhotoSize getPhoto() {
+        return photo;
     }
 
-    public void setVideo(Video video) {
-        this.video = video;
+    public void setPhoto(PhotoSize photo) {
+        this.photo = photo;
     }
 
     public InputFile getInputFile() {
@@ -91,11 +100,11 @@ public class RequestSendVideo {
         this.disableNotification = disableNotification;
     }
 
-    public int getReplyToMessageId() {
-        return replyToMessageId;
+    public Message getReplyToMessage() {
+        return replyToMessage;
     }
 
-    public void setReplyToMessageId(int replyToMessageId) {
-        this.replyToMessageId = replyToMessageId;
+    public void setReplyToMessage(Message replyToMessage) {
+        this.replyToMessage = replyToMessage;
     }
 }

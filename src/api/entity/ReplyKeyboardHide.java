@@ -1,6 +1,8 @@
 package api.entity;
 
-public class ReplyKeyboardHide {
+import java.io.Serializable;
+
+public class ReplyKeyboardHide implements Serializable {
     private boolean hide_keyboard = true;
     private boolean selective;
 

@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Sticker {
+import java.io.Serializable;
+
+public class Sticker implements Serializable {
     private String file_id;
     private int width;
     private int height;

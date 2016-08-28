@@ -2,7 +2,9 @@ package api.entity;
 
 import org.apache.catalina.Loader;
 
-public class Location {
+import java.io.Serializable;
+
+public class Location implements Serializable {
     private Double longitude;
     private Double latitude;
 

@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Document {
+import java.io.Serializable;
+
+public class Document implements Serializable {
     private String file_id;
     private PhotoSize thumb;
     private String file_name;

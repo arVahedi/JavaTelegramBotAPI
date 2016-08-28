@@ -1,6 +1,8 @@
 package api.entity;
 
-public class Audio {
+import java.io.Serializable;
+
+public class Audio implements Serializable {
     private String file_id;
     private int duration;
     private String performer;
