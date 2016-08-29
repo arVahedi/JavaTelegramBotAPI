@@ -1,7 +1,5 @@
 package api.entity;
 
-import org.apache.catalina.Loader;
-
 import java.io.Serializable;
 
 public class Location implements Serializable {

@@ -4,6 +4,7 @@ import api.entity.Message;
 import api.entity.User;
 import api.requestobject.RequestForwardMessage;
 import api.requestobject.RequestSendMessage;
+import api.requestobject.RequestSendPhoto;
 
 import java.io.IOException;
 
@@ -18,5 +19,7 @@ public interface BotInterface {
     Message sendMessage(RequestSendMessage requestSendMessage) throws IOException;
 
     Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException;
+
+    Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException;
 
 }
