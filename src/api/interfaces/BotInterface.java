@@ -24,4 +24,6 @@ public interface BotInterface {
 
     Message sendDocument(RequestSendDocument requestSendDocument) throws IOException;
 
+    Message sendSticker(RequestSendSticker requestSendSticker) throws IOException;
+
 }

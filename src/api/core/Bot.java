@@ -336,11 +336,65 @@ public class Bot implements BotInterface {
         } else {
             throw new SendDocumentException("Illegal Response.");
         }
-
     }
 
-    public void sendSticker(RequestSendSticker requestSendSticker) {
+    /**
+     * Use this method to send .webp stickers. On success, the sent Message is returned.
+     *
+     * @param requestSendSticker Request send sticker
+     *
+     * @return send Message is returned
+     *
+     * @throws IOException
+     */
+    public Message sendSticker(RequestSendSticker requestSendSticker) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendSticker?");
+        HashMap<String, String> attributes = new HashMap<>();
 
+        String chatId;
+        if (requestSendSticker.getChat().isValid()) {
+            chatId = requestSendSticker.getChat().getChatId();
+        } else {
+            throw new SendStickerException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendSticker.isDisableNotification()));
+
+        if (requestSendSticker.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendSticker.getReplyToMessageId()));
+        }
+
+        if (requestSendSticker.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendSticker.getReplyMarkup()));
+        }
+
+        JSONObject jsonResponse;
+        if (requestSendSticker.getSticker() != null){       // We don't upload sticker. Using file_id instead.
+            attributes.put("sticker", requestSendSticker.getSticker().getFileId());
+            urlBuilder.append("chat_id=").append(chatId);
+            attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+            SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+            try {
+                jsonResponse = sslConnection.getSSLConnection();
+            } catch (Exception e) {
+                throw new SendStickerException(e.getMessage());
+            }
+        } else if (requestSendSticker.getInputFile() != null){      // We are uploading sticker.
+            attributes.put("chat_id", chatId);
+            HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+            fileMap.put("sticker", new java.io.File(requestSendSticker.getInputFile().getPath()));
+            MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+            multipartFormData.initialize();
+            jsonResponse = multipartFormData.send();
+        } else {
+            throw new SendStickerException("Sticker id and input file is null.");
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendStickerException("Illegal Response.");
+        }
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
