@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReplyKeyboardMarkup implements Serializable {
-    private List<List<String>> keyboard = new ArrayList<List<String>>();
+    private List<List<KeyboardButton>> keyboard = new ArrayList<>();
     private boolean resize_keyboard;
     private boolean one_time_keyboard;
     private boolean selective;
 
-    public List<List<String>> getKeyboard() {
+    public List<List<KeyboardButton>> getKeyboard() {
         return keyboard;
     }
 
-    public void setKeyboard(List<List<String>> keyboard) {
+    public void setKeyboard(List<List<KeyboardButton>> keyboard) {
         this.keyboard = keyboard;
     }
 

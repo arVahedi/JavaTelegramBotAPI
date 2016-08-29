@@ -34,11 +34,7 @@ public class SSLConnection {
         }
         in.close();
 
-        //convert to com.company.json
-        JSONObject jsonObject = new JSONObject(response.toString());
-
-
-        return jsonObject;
+        return new JSONObject(response.toString());
     }
 
     private void printContent(HttpsURLConnection con) {

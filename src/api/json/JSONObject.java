@@ -111,7 +111,7 @@ public class JSONObject {
          * A Null object is equal to the null value and to itself.
          *
          * @param object
-         *            An object to test for nullness.
+         *            An object to example for nullness.
          * @return true if the object parameter is the JSONObject.NULL object or
          *         null.
          */
@@ -1526,7 +1526,7 @@ public class JSONObject {
      * Throw an com.company.exception if the object is a NaN or infinite number.
      *
      * @param o
-     *            The object to test.
+     *            The object to example.
      * @throws JSONException
      *             If o is a non-finite number.
      */

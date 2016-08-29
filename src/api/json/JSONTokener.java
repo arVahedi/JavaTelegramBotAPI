@@ -83,7 +83,7 @@ public class JSONTokener {
 
     /**
      * Back up one character. This provides a sort of lookahead capability,
-     * so that you can test for a digit or letter before attempting to parse
+     * so that you can example for a digit or letter before attempting to parse
      * the next number or identifier.
      */
     public void back() throws JSONException {

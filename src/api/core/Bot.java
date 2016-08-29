@@ -48,7 +48,6 @@ public class Bot implements BotInterface {
      * Requires no parameters. Returns basic information about the bot in form of a User object.
      *
      * @return {@link api.entity.User User} - Basic information about the bot
-     *
      * @throws IOException
      */
     public User getMe() throws IOException {
@@ -71,9 +70,7 @@ public class Bot implements BotInterface {
      * Use this method to send text messages. On success, the sent Message is returned.
      *
      * @param requestSendMessage request send message
-     *
      * @return Message - The send message is returned.
-     *
      * @throws IOException
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
@@ -119,9 +116,7 @@ public class Bot implements BotInterface {
      * Use this method to forward messages of any kind. On success, the sent Message is returned.
      *
      * @param requestForwardMessage Request forward message
-     *
      * @return send Message is returned.
-     *
      * @throws IOException
      */
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
@@ -156,9 +151,7 @@ public class Bot implements BotInterface {
      * Use this method to send photos. On success, the sent Message is returned.
      *
      * @param requestSendPhoto Request send photo
-     *
      * @return send Message is returned.
-     *
      * @throws IOException
      */
     public Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException {
@@ -173,33 +166,27 @@ public class Bot implements BotInterface {
         }
 
         if (requestSendPhoto.getReplyToMessage() != null) {
-            attributes.put("reply_to_message_id=", String.valueOf(requestSendPhoto.getReplyToMessage().getMessageId()));
+            attributes.put("reply_to_message_id", String.valueOf(requestSendPhoto.getReplyToMessage().getMessageId()));
         }
 
         if (requestSendPhoto.getCaption() != null) {
-            attributes.put("caption=", requestSendPhoto.getCaption());
+            attributes.put("caption", requestSendPhoto.getCaption());
         }
 
-        // TODO: 8/29/2016 AD check this attribute to work.
         if (requestSendPhoto.getReplyMarkup() != null) {
-            attributes.put("reply_markup=", JsonUtil.toJsonSerializable(requestSendPhoto.getReplyMarkup()));
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendPhoto.getReplyMarkup()));
         }
 
         attributes.put("disable_notification", String.valueOf(requestSendPhoto.isDisableNotification()));
 
+        JSONObject jsonResponse;
         if (requestSendPhoto.getPhoto() != null) {      // We don't upload file. Using photo_id instead.
             attributes.put("photo", requestSendPhoto.getPhoto().getFileId());
             urlBuilder.append("chat_id=" + chatId);
             attributes.forEach((key, value) -> urlBuilder.append("&" + key + "=" + value));
             SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
             try {
-                JSONObject jsonResponse = sslConnection.getSSLConnection();
-                if ((boolean) jsonResponse.get("ok")) {
-                    Message message = (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
-                    return message;
-                } else {
-                    throw new ForwardMessageException("Illegal Response.");
-                }
+                jsonResponse = sslConnection.getSSLConnection();
             } catch (Exception e) {
                 throw new SendChatActionException(e.getMessage());
             }
@@ -209,13 +196,16 @@ public class Bot implements BotInterface {
             fileMap.put("photo", new java.io.File(requestSendPhoto.getInputFile().getPath()));
             MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
             multipartFormData.initialize();
-            multipartFormData.send();
-            // TODO: 8/29/2016 AD get return message and return that instead null.
-            return null;
+            jsonResponse = multipartFormData.send();
         } else {
             throw new SendPhotoException("Photo id or input file is null");
         }
 
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new ForwardMessageException("Illegal Response.");
+        }
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
