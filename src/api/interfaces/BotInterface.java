@@ -3,6 +3,7 @@ package api.interfaces;
 import api.entity.Message;
 import api.entity.User;
 import api.requestobject.RequestForwardMessage;
+import api.requestobject.RequestSendAudio;
 import api.requestobject.RequestSendMessage;
 import api.requestobject.RequestSendPhoto;
 
@@ -21,5 +22,7 @@ public interface BotInterface {
     Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException;
 
     Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException;
+
+    Message sendAudio(RequestSendAudio requestSendAudio) throws IOException;
 
 }

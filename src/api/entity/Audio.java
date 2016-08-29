@@ -17,6 +17,15 @@ public class Audio implements Serializable {
         this.file_id = file_id;
     }
 
+    public Audio(String file_id, int duration, String performer, String title, String mime_type, int file_size){
+        this.file_id = file_id;
+        this.duration = duration;
+        this.performer = performer;
+        this.title = title;
+        this.mime_type = mime_type;
+        this.file_size = file_size;
+    }
+
     public String getFileId() {
         return file_id;
     }

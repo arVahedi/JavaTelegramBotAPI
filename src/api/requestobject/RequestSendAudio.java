@@ -10,8 +10,10 @@ public class RequestSendAudio {
     private Audio audio;
     private InputFile inputFile;
     private int replyToMessageId;
+    private boolean disableNotification;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
+    private InlineKeyboardMarkup inlineKeyboardMarkup;
     private ReplyKeyboardMarkup replyKeyboardMarkup;
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
@@ -43,17 +45,25 @@ public class RequestSendAudio {
             this.replyKeyboardHide = (ReplyKeyboardHide) replyMarkup;
         } else if (replyMarkup instanceof ForceReply) {
             this.forceReply = (ForceReply) replyMarkup;
+        } else if (replyMarkup instanceof InlineKeyboardMarkup) {
+            this.inlineKeyboardMarkup = (InlineKeyboardMarkup) replyMarkup;
         }
     }
 
     public Object getReplyMarkup(){
-        if (this.replyKeyboardMarkup != null){
+        if (this.replyKeyboardMarkup != null) {
             return this.replyKeyboardMarkup;
-        }if (this.replyKeyboardHide != null){
+        }
+        if (this.replyKeyboardHide != null) {
             return this.replyKeyboardHide;
-        }else {
+        }
+        if (this.forceReply != null) {
             return this.forceReply;
         }
+        if (this.inlineKeyboardMarkup != null) {
+            return this.inlineKeyboardMarkup;
+        }
+        return null;
     }
 
     public Chat getChat() {
@@ -80,4 +90,11 @@ public class RequestSendAudio {
         this.inputFile = inputFile;
     }
 
+    public boolean isDisableNotification() {
+        return disableNotification;
+    }
+
+    public void setDisableNotification(boolean disableNotification) {
+        this.disableNotification = disableNotification;
+    }
 }
