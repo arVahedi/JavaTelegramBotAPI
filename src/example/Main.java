@@ -1,7 +1,11 @@
 package example;
 
 import api.core.Bot;
-import api.entity.*;
+import api.entity.Chat;
+import api.entity.InputFile;
+import api.entity.KeyboardButton;
+import api.entity.ReplyKeyboardMarkup;
+import api.requestobject.RequestSendDocument;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,11 +27,13 @@ public class Main {
         List<KeyboardButton> buttonGroup1 = new ArrayList<>();
         buttonGroup1.add(button1);
         buttonGroup1.add(button2);
-        buttonGroup1.add(button3);
-        buttonGroup1.add(button4);
+        List<KeyboardButton> buttonGroup2 = new ArrayList<>();
+        buttonGroup2.add(button3);
+        buttonGroup2.add(button4);
 
         List<List<KeyboardButton>> buttonList = new ArrayList<>();
         buttonList.add(buttonGroup1);
+        buttonList.add(buttonGroup2);
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setKeyboard(buttonList);
 
@@ -54,8 +60,20 @@ public class Main {
         requestSendPhoto.setReplyMarkup(replyKeyboardMarkup);
         Bot.getInstance().sendPhoto(requestSendPhoto);*/
 
+        // Send audio file
+        /*RequestSendAudio requestSendAudio = new RequestSendAudio();
+        requestSendAudio.setChat(chat);
+        requestSendAudio.setDisableNotification(false);
+        requestSendAudio.setInputFile(new InputFile("/Users/Gladiator/Desktop/1.mp3"));
+        requestSendAudio.setReplyMarkup(replyKeyboardMarkup);
+        Message responseUploadAudio = Bot.getInstance().sendAudio(requestSendAudio);*/
 
-
+        // Send document
+        RequestSendDocument requestSendDocument = new RequestSendDocument();
+        requestSendDocument.setChat(chat);
+        requestSendDocument.setInputFile(new InputFile("/Users/Gladiator/Desktop/url.txt"));
+        requestSendDocument.setReplyMarkup(replyKeyboardMarkup);
+        Bot.getInstance().sendDocument(requestSendDocument);
 
     }
 }

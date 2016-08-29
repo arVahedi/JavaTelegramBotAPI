@@ -274,6 +274,75 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     *Use this method to send general files. On success, the sent Message is returned.
+     * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     *
+     * @param requestSendDocument Request send document
+     *
+     * @return send Message is returned
+     *
+     * @throws IOException
+     */
+    public Message sendDocument(RequestSendDocument requestSendDocument) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendDocument?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendDocument.getChat().isValid()) {
+            chatId = requestSendDocument.getChat().getChatId();
+        } else {
+            throw new SendDocumentException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendDocument.isDisableNotification()));
+
+        if (requestSendDocument.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendDocument.getReplyToMessageId()));
+        }
+
+        if (requestSendDocument.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendDocument.getReplyMarkup()));
+        }
+
+        if (requestSendDocument.getCaption() != null){
+            attributes.put("caption", requestSendDocument.getCaption());
+        }
+
+        JSONObject jsonResponse;
+        if (requestSendDocument.getDocument() != null){     // We don't upload file. Using file_id instead.
+            attributes.put("document", requestSendDocument.getDocument().getFileId());
+            urlBuilder.append("chat_id=").append(chatId);
+            attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+            SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+            try {
+                jsonResponse = sslConnection.getSSLConnection();
+            } catch (Exception e) {
+                throw new SendDocumentException(e.getMessage());
+            }
+        } else if (requestSendDocument.getInputFile() != null){
+            attributes.put("chat_id", chatId);
+            HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+            fileMap.put("document", new java.io.File(requestSendDocument.getInputFile().getPath()));
+            MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+            multipartFormData.initialize();
+            jsonResponse = multipartFormData.send();
+        } else {
+            throw new SendDocumentException("Document id and input file is null.");
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendDocumentException("Illegal Response.");
+        }
+
+    }
+
+    public void sendSticker(RequestSendSticker requestSendSticker) {
+
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 
@@ -408,86 +477,6 @@ public class Bot implements BotInterface {
         }
 
         return file;
-    }
-
-    public void sendDocument(RequestSendDocument requestSendDocument) {
-        String chatId;
-        if (requestSendDocument.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendDocument.getChat().getId());
-        } else if (requestSendDocument.getChat().getUsername() != null) {
-            chatId = requestSendDocument.getChat().getUsername();
-        } else {
-            throw new SendDocumentException("Chat id or chat username is null");
-        }
-
-        String documentId;
-        if (requestSendDocument.getDocument().getFileId() != null) {
-            documentId = requestSendDocument.getDocument().getFileId();
-        } else if (requestSendDocument.getInputFile() != null) {
-            // TODO: how to send input file via multipart-form-data
-            documentId = "";
-        } else {
-            throw new SendDocumentException("Document id or input file is null");
-        }
-
-        String sendDocumentUrl = API_URL + token + "/sendDocument?chat_id=" + chatId
-                + "&document=" + documentId + "&disableNotification=" + requestSendDocument.isDisableNotification();
-
-        if (requestSendDocument.getReplyToMessageId() != 0) {
-            sendDocumentUrl = sendDocumentUrl + "&reply_to_message_id=" + requestSendDocument.getReplyToMessageId();
-        }
-
-        if (requestSendDocument.getCaption() != null) {
-            sendDocumentUrl = sendDocumentUrl + "&caption=" + requestSendDocument.getCaption();
-        }
-
-        //TODO: add replyMarkup support;
-
-        SSLConnection sslConnection = new SSLConnection(sendDocumentUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
-
-    }
-
-    public void sendSticker(RequestSendSticker requestSendSticker) {
-        String chatId;
-        if (requestSendSticker.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendSticker.getChat().getId());
-        } else if (requestSendSticker.getChat().getUsername() != null) {
-            chatId = requestSendSticker.getChat().getUsername();
-        } else {
-            throw new SendStickerException("Chat id or chat username is null");
-        }
-
-        String stickerId;
-        if (requestSendSticker.getSticker().getFileId() != null) {
-            stickerId = requestSendSticker.getSticker().getFileId();
-        } else if (requestSendSticker.getInputFile() != null) {
-            // TODO: how to send input file via multipart-form-data
-            stickerId = "";
-        } else {
-            throw new SendStickerException("Sticker id or input file is null");
-        }
-
-        String sendStickerUrl = API_URL + token + "/sendSticker?chat_id=" + chatId
-                + "&sticker=" + stickerId + "&disableNotification=" + requestSendSticker.isDisableNotification();
-
-        if (requestSendSticker.getReplyToMessageId() != 0) {
-            sendStickerUrl = sendStickerUrl + "&reply_to_message_id=" + requestSendSticker.getReplyToMessageId();
-        }
-
-        //TODO: add replyMarkup support;
-
-        SSLConnection sslConnection = new SSLConnection(sendStickerUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
-
     }
 
     public void sendVideo(RequestSendVideo requestSendVideo) {
