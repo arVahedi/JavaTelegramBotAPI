@@ -26,4 +26,6 @@ public interface BotInterface {
 
     Message sendSticker(RequestSendSticker requestSendSticker) throws IOException;
 
+    Message sendVideo(RequestSendVideo requestSendVideo) throws IOException;
+
 }

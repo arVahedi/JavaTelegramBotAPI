@@ -1,11 +1,10 @@
 package example;
 
 import api.core.Bot;
-import api.entity.Chat;
-import api.entity.InputFile;
-import api.entity.KeyboardButton;
-import api.entity.ReplyKeyboardMarkup;
+import api.entity.*;
 import api.requestobject.RequestSendDocument;
+import api.requestobject.RequestSendPhoto;
+import api.requestobject.RequestSendVideo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,8 +50,9 @@ public class Main {
         // Upload photo
         /*RequestSendPhoto requestUploadPhoto = new RequestSendPhoto();
         requestUploadPhoto.setChat(chat);
-        requestUploadPhoto.setInputFile(new InputFile("/home/gladiator/Desktop/1.jpg"));
+        requestUploadPhoto.setInputFile(new InputFile("/Users/Gladiator/Desktop/1.jpg"));
         requestUploadPhoto.setReplyMarkup(replyKeyboardMarkup);
+        requestUploadPhoto.setCaption("Hacked stamp.");
         Message responseUploadPhoto = Bot.getInstance().sendPhoto(requestUploadPhoto);*/
 
         // Resend photo by file_id
@@ -69,11 +69,18 @@ public class Main {
         Message responseUploadAudio = Bot.getInstance().sendAudio(requestSendAudio);*/
 
         // Send document
-        RequestSendDocument requestSendDocument = new RequestSendDocument();
+        /*RequestSendDocument requestSendDocument = new RequestSendDocument();
         requestSendDocument.setChat(chat);
         requestSendDocument.setInputFile(new InputFile("/Users/Gladiator/Desktop/url.txt"));
         requestSendDocument.setReplyMarkup(replyKeyboardMarkup);
-        Bot.getInstance().sendDocument(requestSendDocument);
+        Bot.getInstance().sendDocument(requestSendDocument);*/
+
+        // Send video
+        /*RequestSendVideo requestSendVideo = new RequestSendVideo();
+        requestSendVideo.setChat(chat);
+        requestSendVideo.setInputFile(new InputFile("/Users/Gladiator/Desktop/1.mp4"));
+        requestSendVideo.setCaption("caption of file.");
+        Bot.getInstance().sendVideo(requestSendVideo);*/
 
     }
 }

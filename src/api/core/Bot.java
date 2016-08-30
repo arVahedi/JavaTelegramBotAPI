@@ -21,6 +21,8 @@ import java.util.List;
 
 /**
  * Created by Gladiator on 8/26/2016 AD.
+ *
+ * Updated for (May 25, 2016)
  */
 public class Bot implements BotInterface {
     private String id;
@@ -397,6 +399,85 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     * Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as Document).
+     * On success, the sent Message is returned. Bots can currently send video files of up to 50 MB in size,
+     * this limit may be changed in the future.
+     *
+     * @param requestSendVideo Request send video
+     *
+     * @return send Message is returned
+     *
+     * @throws IOException
+     */
+    public Message sendVideo(RequestSendVideo requestSendVideo) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendVideo?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendVideo.getChat().isValid()){
+            chatId = requestSendVideo.getChat().getChatId();
+        }else{
+            throw new SendVideoException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendVideo.isDisableNotification()));
+
+        if (requestSendVideo.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendVideo.getReplyToMessageId()));
+        }
+
+        if (requestSendVideo.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendVideo.getReplyMarkup()));
+        }
+
+        if (requestSendVideo.getCaption() != null){
+            attributes.put("caption", requestSendVideo.getCaption());
+        }
+
+        if (requestSendVideo.getVideo() != null){
+            if (requestSendVideo.getVideo().getDuration() != 0){
+                attributes.put("duration", String.valueOf(requestSendVideo.getVideo().getDuration()));
+            }
+
+            if (requestSendVideo.getVideo().getWidth() != 0){
+                attributes.put("width", String.valueOf(requestSendVideo.getVideo().getWidth()));
+            }
+
+            if (requestSendVideo.getVideo().getHeight() != 0){
+                attributes.put("height", String.valueOf(requestSendVideo.getVideo().getHeight()));
+            }
+        }
+
+        JSONObject jsonResponse;
+        if (requestSendVideo.getVideo() != null && requestSendVideo.getVideo().getFileId() != null) {   // We don't upload video; We used file_id instead.
+            attributes.put("video", requestSendVideo.getVideo().getFileId());
+            urlBuilder.append("chat_id=").append(chatId);
+            attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+            SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+            try {
+                jsonResponse = sslConnection.getSSLConnection();
+            } catch (Exception e) {
+                throw new SendVideoException(e.getMessage());
+            }
+        } else if (requestSendVideo.getInputFile() != null) {   // We are uploading video file;
+            attributes.put("chat_id", chatId);
+            HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+            fileMap.put("video", new java.io.File(requestSendVideo.getInputFile().getPath()));
+            MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+            multipartFormData.initialize();
+            jsonResponse = multipartFormData.send();
+        } else {
+            throw new SendVideoException("Video id and input file is null");
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendVideoException("Illegal Response.");
+        }
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 
@@ -531,59 +612,6 @@ public class Bot implements BotInterface {
         }
 
         return file;
-    }
-
-    public void sendVideo(RequestSendVideo requestSendVideo) {
-        String chatId;
-        if (requestSendVideo.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendVideo.getChat().getId());
-        } else if (requestSendVideo.getChat().getUsername() != null) {
-            chatId = requestSendVideo.getChat().getUsername();
-        } else {
-            throw new SendVoiceException("Chat id or chat username is null");
-        }
-
-        String videoId;
-        if (requestSendVideo.getVideo().getFileId() != null) {
-            videoId = requestSendVideo.getVideo().getFileId();
-        } else if (requestSendVideo.getInputFile() != null) {
-            // TODO: how to send input file via multipart-form-data
-            videoId = "";
-        } else {
-            throw new SendVoiceException("Video id or input file is null");
-        }
-
-        String sendVideoUrl = API_URL + token + "/sendVideo?chat_id=" + chatId
-                + "&video=" + videoId + "&disableNotification=" + requestSendVideo.isDisableNotification();
-
-        if (requestSendVideo.getReplyToMessageId() != 0) {
-            sendVideoUrl = sendVideoUrl + "&reply_to_message_id=" + requestSendVideo.getReplyToMessageId();
-        }
-
-        if (requestSendVideo.getCaption() != null) {
-            sendVideoUrl = sendVideoUrl + "&caption=" + requestSendVideo.getCaption();
-        }
-
-        if (requestSendVideo.getVideo().getDuration() != 0) {
-            sendVideoUrl = sendVideoUrl + "&duration=" + requestSendVideo.getVideo().getDuration();
-        }
-
-        if (requestSendVideo.getVideo().getWidth() != 0) {
-            sendVideoUrl = sendVideoUrl + "&width=" + requestSendVideo.getVideo().getWidth();
-        }
-
-        if (requestSendVideo.getVideo().getHeight() != 0) {
-            sendVideoUrl = sendVideoUrl + "&height=" + requestSendVideo.getVideo().getHeight();
-        }
-
-        //TODO: add replyMarkup support;
-
-        SSLConnection sslConnection = new SSLConnection(sendVideoUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
     }
 
     public void sendVoice(RequestSendVoice requestSendVoice) {
