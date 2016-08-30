@@ -32,4 +32,6 @@ public interface BotInterface {
 
     Message sendLocation(RequestSendLocation requestSendLocation);
 
+    Message sendVenue(RequestSendVenue requestSendVenue);
+
 }

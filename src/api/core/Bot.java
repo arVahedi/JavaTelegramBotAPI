@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * Created by Gladiator on 8/26/2016 AD.
- *
+ * <p>
  * Updated for (May 25, 2016)
  */
 public class Bot implements BotInterface {
@@ -50,6 +50,7 @@ public class Bot implements BotInterface {
      * Requires no parameters. Returns basic information about the bot in form of a User object.
      *
      * @return {@link api.entity.User User} - Basic information about the bot
+     *
      * @throws IOException
      */
     public User getMe() throws IOException {
@@ -69,7 +70,9 @@ public class Bot implements BotInterface {
      * Use this method to send text messages. On success, the sent Message is returned.
      *
      * @param requestSendMessage request send message
+     *
      * @return Message - The send message is returned.
+     *
      * @throws IOException
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
@@ -114,7 +117,9 @@ public class Bot implements BotInterface {
      * Use this method to forward messages of any kind. On success, the sent Message is returned.
      *
      * @param requestForwardMessage Request forward message
+     *
      * @return send Message is returned.
+     *
      * @throws IOException
      */
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
@@ -148,7 +153,9 @@ public class Bot implements BotInterface {
      * Use this method to send photos. On success, the sent Message is returned.
      *
      * @param requestSendPhoto Request send photo
+     *
      * @return send Message is returned.
+     *
      * @throws IOException
      */
     public Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException {
@@ -211,7 +218,9 @@ public class Bot implements BotInterface {
      * Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendAudio Request send audio
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendAudio(RequestSendAudio requestSendAudio) throws IOException {
@@ -277,7 +286,7 @@ public class Bot implements BotInterface {
     }
 
     /**
-     *Use this method to send general files. On success, the sent Message is returned.
+     * Use this method to send general files. On success, the sent Message is returned.
      * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendDocument Request send document
@@ -307,12 +316,12 @@ public class Bot implements BotInterface {
             attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendDocument.getReplyMarkup()));
         }
 
-        if (requestSendDocument.getCaption() != null){
+        if (requestSendDocument.getCaption() != null) {
             attributes.put("caption", requestSendDocument.getCaption());
         }
 
         JSONObject jsonResponse;
-        if (requestSendDocument.getDocument() != null){     // We don't upload file. Using file_id instead.
+        if (requestSendDocument.getDocument() != null) {     // We don't upload file. Using file_id instead.
             attributes.put("document", requestSendDocument.getDocument().getFileId());
             urlBuilder.append("chat_id=").append(chatId);
             attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
@@ -322,7 +331,7 @@ public class Bot implements BotInterface {
             } catch (Exception e) {
                 throw new SendDocumentException(e.getMessage());
             }
-        } else if (requestSendDocument.getInputFile() != null){
+        } else if (requestSendDocument.getInputFile() != null) {
             attributes.put("chat_id", chatId);
             HashMap<String, java.io.File> fileMap = new HashMap<>(1);
             fileMap.put("document", new java.io.File(requestSendDocument.getInputFile().getPath()));
@@ -371,7 +380,7 @@ public class Bot implements BotInterface {
         }
 
         JSONObject jsonResponse;
-        if (requestSendSticker.getSticker() != null){       // We don't upload sticker. Using file_id instead.
+        if (requestSendSticker.getSticker() != null) {       // We don't upload sticker. Using file_id instead.
             attributes.put("sticker", requestSendSticker.getSticker().getFileId());
             urlBuilder.append("chat_id=").append(chatId);
             attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
@@ -381,7 +390,7 @@ public class Bot implements BotInterface {
             } catch (Exception e) {
                 throw new SendStickerException(e.getMessage());
             }
-        } else if (requestSendSticker.getInputFile() != null){      // We are uploading sticker.
+        } else if (requestSendSticker.getInputFile() != null) {      // We are uploading sticker.
             attributes.put("chat_id", chatId);
             HashMap<String, java.io.File> fileMap = new HashMap<>(1);
             fileMap.put("sticker", new java.io.File(requestSendSticker.getInputFile().getPath()));
@@ -415,9 +424,9 @@ public class Bot implements BotInterface {
         HashMap<String, String> attributes = new HashMap<>();
 
         String chatId;
-        if (requestSendVideo.getChat().isValid()){
+        if (requestSendVideo.getChat().isValid()) {
             chatId = requestSendVideo.getChat().getChatId();
-        }else{
+        } else {
             throw new SendVideoException("Chat id and chat username is null");
         }
 
@@ -431,20 +440,20 @@ public class Bot implements BotInterface {
             attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendVideo.getReplyMarkup()));
         }
 
-        if (requestSendVideo.getCaption() != null){
+        if (requestSendVideo.getCaption() != null) {
             attributes.put("caption", requestSendVideo.getCaption());
         }
 
-        if (requestSendVideo.getVideo() != null){
-            if (requestSendVideo.getVideo().getDuration() != 0){
+        if (requestSendVideo.getVideo() != null) {
+            if (requestSendVideo.getVideo().getDuration() != 0) {
                 attributes.put("duration", String.valueOf(requestSendVideo.getVideo().getDuration()));
             }
 
-            if (requestSendVideo.getVideo().getWidth() != 0){
+            if (requestSendVideo.getVideo().getWidth() != 0) {
                 attributes.put("width", String.valueOf(requestSendVideo.getVideo().getWidth()));
             }
 
-            if (requestSendVideo.getVideo().getHeight() != 0){
+            if (requestSendVideo.getVideo().getHeight() != 0) {
                 attributes.put("height", String.valueOf(requestSendVideo.getVideo().getHeight()));
             }
         }
@@ -495,9 +504,9 @@ public class Bot implements BotInterface {
         HashMap<String, String> attributes = new HashMap<>();
 
         String chatId;
-        if (requestSendVoice.getChat().isValid()){
+        if (requestSendVoice.getChat().isValid()) {
             chatId = requestSendVoice.getChat().getChatId();
-        }else{
+        } else {
             throw new SendVoiceException("Chat id and Chat username is null");
         }
 
@@ -511,8 +520,8 @@ public class Bot implements BotInterface {
             attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendVoice.getReplyMarkup()));
         }
 
-        if (requestSendVoice.getVoice() != null){
-            if (requestSendVoice.getVoice().getDuration() != 0){
+        if (requestSendVoice.getVoice() != null) {
+            if (requestSendVoice.getVoice().getDuration() != 0) {
                 attributes.put("duration", String.valueOf(requestSendVoice.getVoice().getDuration()));
             }
         }
@@ -558,9 +567,9 @@ public class Bot implements BotInterface {
         HashMap<String, String> attributes = new HashMap<>();
 
         String chatId;
-        if (requestSendLocation.getChat().isValid()){
+        if (requestSendLocation.getChat().isValid()) {
             chatId = requestSendLocation.getChat().getChatId();
-        }else{
+        } else {
             throw new SendLocationException("Chat id and chat username is null");
         }
 
@@ -591,6 +600,60 @@ public class Bot implements BotInterface {
             return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendLocationException("Illegal Response.");
+        }
+    }
+
+    /**
+     * Use this method to send information about a venue. On success, the sent Message is returned.
+     *
+     * @param requestSendVenue Request send venue
+     *
+     * @return send Message is returned
+     */
+    public Message sendVenue(RequestSendVenue requestSendVenue) {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendVenue?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendVenue.getChat().isValid()) {
+            chatId = requestSendVenue.getChat().getChatId();
+        } else {
+            throw new SendVenueException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendVenue.isDisableNotification()));
+
+        if (requestSendVenue.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendVenue.getReplyToMessageId()));
+        }
+
+        if (requestSendVenue.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendVenue.getReplyMarkup()));
+        }
+
+        attributes.put("latitude", String.valueOf(requestSendVenue.getVenue().getLocation().getLatitude()));
+        attributes.put("longitude", String.valueOf(requestSendVenue.getVenue().getLocation().getLongitude()));
+        attributes.put("title", requestSendVenue.getVenue().getTitle());
+        attributes.put("address", requestSendVenue.getVenue().getAddress());
+
+        if (requestSendVenue.getVenue().getFoursquare_id() != null) {
+            attributes.put("foursquare_id", requestSendVenue.getVenue().getFoursquare_id());
+        }
+
+        JSONObject jsonResponse;
+        urlBuilder.append("chat_id=").append(chatId);
+        attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        try {
+            jsonResponse = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendVenueException(e.getMessage());
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendVenueException("Illegal Response.");
         }
     }
 
@@ -636,6 +699,7 @@ public class Bot implements BotInterface {
 
         return listOfAllMessage;
     }
+
     public void sendChatAction(RequestSendChatAction requestSendChatAction) {
         String chatId;
         if (requestSendChatAction.getChat().getId() != 0) {
@@ -656,6 +720,7 @@ public class Bot implements BotInterface {
             throw new SendChatActionException(e.getMessage());
         }
     }
+
     public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
         String getUserProfilePhotoUrl = API_URL + token + "/getUserProfilePhotos?user_id="
                 + requestGetUserProfilePhotos.getUser().getId();
@@ -682,6 +747,7 @@ public class Bot implements BotInterface {
 
         return userProfilePhoto;
     }
+
     public File getFile(RequestGetFile requestGetFile) throws IOException {
         String getFileUrl = API_URL + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
 
@@ -699,6 +765,7 @@ public class Bot implements BotInterface {
 
         return file;
     }
+
     public void setWebHook(RequestSetWebHook requestSetWebHook) {
         //TODO: add input file for certificate file;
         String setWebHookUrl = API_URL + token + "/setWebhook?url=" + requestSetWebHook.getUrl() +

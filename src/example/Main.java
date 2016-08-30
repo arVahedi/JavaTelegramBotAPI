@@ -2,10 +2,7 @@ package example;
 
 import api.core.Bot;
 import api.entity.*;
-import api.requestobject.RequestSendDocument;
-import api.requestobject.RequestSendLocation;
-import api.requestobject.RequestSendPhoto;
-import api.requestobject.RequestSendVideo;
+import api.requestobject.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,6 +83,10 @@ public class Main {
         // Send location
         /*RequestSendLocation requestSendLocation = new RequestSendLocation(chat, new Location(51.3253434, 35.7346714));
         Bot.getInstance().sendLocation(requestSendLocation);*/
+
+        // Send venue
+        /*RequestSendVenue requestSendVenue = new RequestSendVenue(chat, new Venue(new Location(51.3253434, 35.7346714), "Title venue test", "Sadegiyeh sq, abozar, payambaran hostpiral, room 307"));
+        Bot.getInstance().sendVenue(requestSendVenue);*/
 
     }
 }
