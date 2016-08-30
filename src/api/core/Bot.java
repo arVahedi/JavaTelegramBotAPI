@@ -546,6 +546,54 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     * Use this method to send point on the map. On success, the sent Message is returned.
+     *
+     * @param requestSendLocation Request send location
+     *
+     * @return send Message is returned
+     */
+    public Message sendLocation(RequestSendLocation requestSendLocation) {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendLocation?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendLocation.getChat().isValid()){
+            chatId = requestSendLocation.getChat().getChatId();
+        }else{
+            throw new SendLocationException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendLocation.isDisableNotification()));
+
+        if (requestSendLocation.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendLocation.getReplyToMessageId()));
+        }
+
+        if (requestSendLocation.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendLocation.getReplyMarkup()));
+        }
+
+        attributes.put("latitude", String.valueOf(requestSendLocation.getLocation().getLatitude()));
+        attributes.put("longitude", String.valueOf(requestSendLocation.getLocation().getLongitude()));
+
+        urlBuilder.append("chat_id=").append(chatId);
+        attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse;
+        try {
+            jsonResponse = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendLocationException(e.getMessage());
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendLocationException("Illegal Response.");
+        }
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 
@@ -587,32 +635,6 @@ public class Bot implements BotInterface {
         }
 
         return listOfAllMessage;
-    }
-    public void sendLocation(RequestSendLocation requestSendLocation) {
-        String chatId;
-        if (requestSendLocation.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendLocation.getChat().getId());
-        } else if (requestSendLocation.getChat().getUsername() != null) {
-            chatId = requestSendLocation.getChat().getUsername();
-        } else {
-            throw new SendLocationException("Chat id or chat username is null");
-        }
-
-        String sendLocationUrl = API_URL + token + "/sendLocation?chat_id=" + chatId
-                + "&latitude=" + requestSendLocation.getLocation().getLatitude()
-                + "&longitude=" + requestSendLocation.getLocation().getLongitude();
-
-        if (requestSendLocation.getReplyToMessageId() != 0) {
-            sendLocationUrl = sendLocationUrl + "&reply_to_message_id=" + requestSendLocation.getReplyToMessageId();
-        }
-        //TODO: add replyMarkup support;
-
-        SSLConnection sslConnection = new SSLConnection(sendLocationUrl);
-        try {
-            JSONObject jsonResponse = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendLocationException(e.getMessage());
-        }
     }
     public void sendChatAction(RequestSendChatAction requestSendChatAction) {
         String chatId;

@@ -3,6 +3,7 @@ package example;
 import api.core.Bot;
 import api.entity.*;
 import api.requestobject.RequestSendDocument;
+import api.requestobject.RequestSendLocation;
 import api.requestobject.RequestSendPhoto;
 import api.requestobject.RequestSendVideo;
 
@@ -81,6 +82,10 @@ public class Main {
         requestSendVideo.setInputFile(new InputFile("/Users/Gladiator/Desktop/1.mp4"));
         requestSendVideo.setCaption("caption of file.");
         Bot.getInstance().sendVideo(requestSendVideo);*/
+
+        // Send location
+        /*RequestSendLocation requestSendLocation = new RequestSendLocation(chat, new Location(51.3253434, 35.7346714));
+        Bot.getInstance().sendLocation(requestSendLocation);*/
 
     }
 }

@@ -30,4 +30,6 @@ public interface BotInterface {
 
     Message sendVoice(RequestSendVoice requestSendVoice) throws IOException;
 
+    Message sendLocation(RequestSendLocation requestSendLocation);
+
 }
