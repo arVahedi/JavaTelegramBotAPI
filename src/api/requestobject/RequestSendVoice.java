@@ -13,6 +13,7 @@ public class RequestSendVoice {
     private int replyToMessageId;
 
     //Access these field by setReplyMarkup() and getReplyMarkup() functions
+    private InlineKeyboardMarkup inlineKeyboardMarkup;
     private ReplyKeyboardMarkup replyKeyboardMarkup;
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
@@ -37,6 +38,8 @@ public class RequestSendVoice {
             this.replyKeyboardHide = (ReplyKeyboardHide) replyMarkup;
         } else if (replyMarkup instanceof ForceReply) {
             this.forceReply = (ForceReply) replyMarkup;
+        } else if (replyMarkup instanceof InlineKeyboardMarkup) {
+            this.inlineKeyboardMarkup = (InlineKeyboardMarkup) replyMarkup;
         }
     }
 
@@ -46,9 +49,14 @@ public class RequestSendVoice {
         }
         if (this.replyKeyboardHide != null) {
             return this.replyKeyboardHide;
-        } else {
+        }
+        if (this.forceReply != null) {
             return this.forceReply;
         }
+        if (this.inlineKeyboardMarkup != null) {
+            return this.inlineKeyboardMarkup;
+        }
+        return null;
     }
 
     public Chat getChat() {

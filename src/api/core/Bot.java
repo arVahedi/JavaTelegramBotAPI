@@ -478,6 +478,74 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     * Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
+     * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Audio or Document).
+     * On success, the sent Message is returned. Bots can currently send voice messages of up to 50 MB in size,
+     * this limit may be changed in the future.
+     *
+     * @param requestSendVoice Request send voice
+     *
+     * @return send Message is returned
+     *
+     * @throws IOException
+     */
+    public Message sendVoice(RequestSendVoice requestSendVoice) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendVoice?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendVoice.getChat().isValid()){
+            chatId = requestSendVoice.getChat().getChatId();
+        }else{
+            throw new SendVoiceException("Chat id and Chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendVoice.isDisableNotification()));
+
+        if (requestSendVoice.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendVoice.getReplyToMessageId()));
+        }
+
+        if (requestSendVoice.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendVoice.getReplyMarkup()));
+        }
+
+        if (requestSendVoice.getVoice() != null){
+            if (requestSendVoice.getVoice().getDuration() != 0){
+                attributes.put("duration", String.valueOf(requestSendVoice.getVoice().getDuration()));
+            }
+        }
+
+        JSONObject jsonResponse;
+        if (requestSendVoice.getVoice() != null && requestSendVoice.getVoice().getFileId() != null) {   // We don't upload voice; We used file_id instead.
+            attributes.put("voice", requestSendVoice.getVoice().getFileId());
+            urlBuilder.append("chat_id=").append(chatId);
+            attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+            SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+            try {
+                jsonResponse = sslConnection.getSSLConnection();
+            } catch (Exception e) {
+                throw new SendVoiceException(e.getMessage());
+            }
+        } else if (requestSendVoice.getInputFile() != null) {   // We are uploading voice file;
+            attributes.put("chat_id", chatId);
+            HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+            fileMap.put("voice", new java.io.File(requestSendVoice.getInputFile().getPath()));
+            MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+            multipartFormData.initialize();
+            jsonResponse = multipartFormData.send();
+        } else {
+            throw new SendVideoException("Voice id and input file is null");
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendVoiceException("Illegal Response.");
+        }
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 
@@ -520,7 +588,6 @@ public class Bot implements BotInterface {
 
         return listOfAllMessage;
     }
-
     public void sendLocation(RequestSendLocation requestSendLocation) {
         String chatId;
         if (requestSendLocation.getChat().getId() != 0) {
@@ -547,7 +614,6 @@ public class Bot implements BotInterface {
             throw new SendLocationException(e.getMessage());
         }
     }
-
     public void sendChatAction(RequestSendChatAction requestSendChatAction) {
         String chatId;
         if (requestSendChatAction.getChat().getId() != 0) {
@@ -568,7 +634,6 @@ public class Bot implements BotInterface {
             throw new SendChatActionException(e.getMessage());
         }
     }
-
     public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
         String getUserProfilePhotoUrl = API_URL + token + "/getUserProfilePhotos?user_id="
                 + requestGetUserProfilePhotos.getUser().getId();
@@ -595,7 +660,6 @@ public class Bot implements BotInterface {
 
         return userProfilePhoto;
     }
-
     public File getFile(RequestGetFile requestGetFile) throws IOException {
         String getFileUrl = API_URL + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
 
@@ -613,48 +677,6 @@ public class Bot implements BotInterface {
 
         return file;
     }
-
-    public void sendVoice(RequestSendVoice requestSendVoice) {
-        String chatId;
-        if (requestSendVoice.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendVoice.getChat().getId());
-        } else if (requestSendVoice.getChat().getUsername() != null) {
-            chatId = requestSendVoice.getChat().getUsername();
-        } else {
-            throw new SendVoiceException("Chat id or chat username is null");
-        }
-
-        String voiceId;
-        if (requestSendVoice.getVoice().getFileId() != null) {
-            voiceId = requestSendVoice.getVoice().getFileId();
-        } else if (requestSendVoice.getInputFile() != null) {
-            // TODO: how to send input file via multipart-form-data
-            voiceId = "";
-        } else {
-            throw new SendVoiceException("Voice id or input file is null");
-        }
-
-        String sendVoiceUrl = API_URL + token + "/sendVoice?chat_id=" + chatId
-                + "&voice=" + voiceId + "&disableNotification=" + requestSendVoice.isDisableNotification();
-
-        if (requestSendVoice.getReplyToMessageId() != 0) {
-            sendVoiceUrl = sendVoiceUrl + "&reply_to_message_id=" + requestSendVoice.getReplyToMessageId();
-        }
-
-        if (requestSendVoice.getVoice().getDuration() != 0) {
-            sendVoiceUrl = sendVoiceUrl + "&duration=" + requestSendVoice.getVoice().getDuration();
-        }
-
-        //TODO: add replyMarkup support;
-
-        SSLConnection sslConnection = new SSLConnection(sendVoiceUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
-    }
-
     public void setWebHook(RequestSetWebHook requestSetWebHook) {
         //TODO: add input file for certificate file;
         String setWebHookUrl = API_URL + token + "/setWebhook?url=" + requestSetWebHook.getUrl() +

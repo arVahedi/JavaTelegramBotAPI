@@ -28,4 +28,6 @@ public interface BotInterface {
 
     Message sendVideo(RequestSendVideo requestSendVideo) throws IOException;
 
+    Message sendVoice(RequestSendVoice requestSendVoice) throws IOException;
+
 }
