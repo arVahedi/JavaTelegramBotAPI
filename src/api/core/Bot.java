@@ -685,13 +685,13 @@ public class Bot implements BotInterface {
             attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendContact.getReplyMarkup()));
         }
 
-        if (requestSendContact.getContact() != null){
+        if (requestSendContact.getContact() != null) {
             attributes.put("phone_number", requestSendContact.getContact().getPhoneNumber());
             attributes.put("first_name", requestSendContact.getContact().getFirstName());
             if (requestSendContact.getContact().getLastName() != null) {
                 attributes.put("last_name", requestSendContact.getContact().getLastName());
             }
-        }else{
+        } else {
             throw new SendContactException("Contact object is null");
         }
 
@@ -709,6 +709,45 @@ public class Bot implements BotInterface {
             return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendContactException("Illegal Response.");
+        }
+    }
+
+    /**
+     * Use this method when you need to tell the user that something is happening on the bot's side.
+     * The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+     * We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
+     *
+     * @param requestSendChatAction Request send chat action
+     *
+     * @return boolean
+     */
+    public boolean sendChatAction(RequestSendChatAction requestSendChatAction) {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendChatAction?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendChatAction.getChat().isValid()) {
+            chatId = requestSendChatAction.getChat().getChatId();
+        } else {
+            throw new SendChatActionException("Chat id or chat username is null");
+        }
+
+        attributes.put("action", requestSendChatAction.getAction().value());
+
+        JSONObject jsonResponse;
+        urlBuilder.append("chat_id=").append(chatId);
+        attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        try {
+            jsonResponse = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendChatActionException(e.getMessage());
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (boolean) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Boolean.class);
+        } else {
+            throw new SendChatActionException("Illegal Response.");
         }
     }
 
@@ -753,27 +792,6 @@ public class Bot implements BotInterface {
         }
 
         return listOfAllMessage;
-    }
-
-    public void sendChatAction(RequestSendChatAction requestSendChatAction) {
-        String chatId;
-        if (requestSendChatAction.getChat().getId() != 0) {
-            chatId = String.valueOf(requestSendChatAction.getChat().getId());
-        } else if (requestSendChatAction.getChat().getUsername() != null) {
-            chatId = requestSendChatAction.getChat().getUsername();
-        } else {
-            throw new SendChatActionException("Chat id or chat username is null");
-        }
-
-        String sendChatActionUrl = API_URL + token + "/sendChatAction?chat_id=" + chatId
-                + "&action=" + requestSendChatAction.getAction();
-
-        SSLConnection sslConnection = new SSLConnection(sendChatActionUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
     }
 
     public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {

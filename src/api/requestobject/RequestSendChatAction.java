@@ -1,6 +1,7 @@
 package api.requestobject;
 
 import api.entity.Chat;
+import api.enums.ChatActionEnum;
 
 /**
  * Created by Gladiator on 2/5/2016 AD.
@@ -8,19 +9,16 @@ import api.entity.Chat;
 public class RequestSendChatAction {
     private Chat chat;
 
-    //TODO: this field can be enum variable;
-    private String action;          //typing for text messages, upload_photo for photos, record_video or upload_video for videos,
-                                    // record_audio or upload_audio for audio files, upload_document for general files,
-                                    // find_location for location data.
+    private ChatActionEnum action;
 
     public RequestSendChatAction(){}
 
-    public RequestSendChatAction(Chat chat, String action){
+    public RequestSendChatAction(Chat chat, ChatActionEnum action){
         this.chat = chat;
         this.action = action;
     }
 
-    public RequestSendChatAction(Object chatId, String action){
+    public RequestSendChatAction(Object chatId, ChatActionEnum action){
         this.chat = new Chat(chatId);
         this.action = action;
     }
@@ -33,11 +31,11 @@ public class RequestSendChatAction {
         this.chat = chat;
     }
 
-    public String getAction() {
+    public ChatActionEnum getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(ChatActionEnum action) {
         this.action = action;
     }
 }

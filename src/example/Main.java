@@ -2,6 +2,7 @@ package example;
 
 import api.core.Bot;
 import api.entity.*;
+import api.enums.ChatActionEnum;
 import api.requestobject.*;
 
 import java.io.IOException;
@@ -91,6 +92,10 @@ public class Main {
         // Send contact
         /*RequestSendContact requestSendContact= new RequestSendContact(chat, new Contact("+982144286253", "home"));
         Bot.getInstance().sendContact(requestSendContact);*/
+
+        // Send chat action
+        /*RequestSendChatAction requestSendChatAction = new RequestSendChatAction(chat, ChatActionEnum.TYPING);
+        boolean result = Bot.getInstance().sendChatAction(requestSendChatAction);*/
 
     }
 }

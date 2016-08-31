@@ -36,4 +36,6 @@ public interface BotInterface {
 
     Message sendContact(RequestSendContact requestSendContact);
 
+    boolean sendChatAction(RequestSendChatAction requestSendChatAction);
+
 }
