@@ -88,5 +88,9 @@ public class Main {
         /*RequestSendVenue requestSendVenue = new RequestSendVenue(chat, new Venue(new Location(51.3253434, 35.7346714), "Title venue test", "Sadegiyeh sq, abozar, payambaran hostpiral, room 307"));
         Bot.getInstance().sendVenue(requestSendVenue);*/
 
+        // Send contact
+        /*RequestSendContact requestSendContact= new RequestSendContact(chat, new Contact("+982144286253", "home"));
+        Bot.getInstance().sendContact(requestSendContact);*/
+
     }
 }

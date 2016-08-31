@@ -34,4 +34,6 @@ public interface BotInterface {
 
     Message sendVenue(RequestSendVenue requestSendVenue);
 
+    Message sendContact(RequestSendContact requestSendContact);
+
 }

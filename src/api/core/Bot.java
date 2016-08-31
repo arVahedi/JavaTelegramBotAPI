@@ -657,6 +657,61 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     * Use this method to send phone contacts. On success, the sent Message is returned.
+     *
+     * @param requestSendContact Request send contact
+     *
+     * @return send Message is returned
+     */
+    public Message sendContact(RequestSendContact requestSendContact) {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendContact?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        String chatId;
+        if (requestSendContact.getChat().isValid()) {
+            chatId = requestSendContact.getChat().getChatId();
+        } else {
+            throw new SendContactException("Chat id and chat username is null");
+        }
+
+        attributes.put("disable_notification", String.valueOf(requestSendContact.isDisableNotification()));
+
+        if (requestSendContact.getReplyToMessageId() != 0) {
+            attributes.put("reply_to_message_id", String.valueOf(requestSendContact.getReplyToMessageId()));
+        }
+
+        if (requestSendContact.getReplyMarkup() != null) {
+            attributes.put("reply_markup", JsonUtil.toJsonSerializable(requestSendContact.getReplyMarkup()));
+        }
+
+        if (requestSendContact.getContact() != null){
+            attributes.put("phone_number", requestSendContact.getContact().getPhoneNumber());
+            attributes.put("first_name", requestSendContact.getContact().getFirstName());
+            if (requestSendContact.getContact().getLastName() != null) {
+                attributes.put("last_name", requestSendContact.getContact().getLastName());
+            }
+        }else{
+            throw new SendContactException("Contact object is null");
+        }
+
+        JSONObject jsonResponse;
+        urlBuilder.append("chat_id=").append(chatId);
+        attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        try {
+            jsonResponse = sslConnection.getSSLConnection();
+        } catch (Exception e) {
+            throw new SendContactException(e.getMessage());
+        }
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+        } else {
+            throw new SendContactException("Illegal Response.");
+        }
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 
