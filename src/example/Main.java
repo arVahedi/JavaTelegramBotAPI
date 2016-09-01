@@ -2,8 +2,8 @@ package example;
 
 import api.core.Bot;
 import api.entity.*;
-import api.enums.ChatActionEnum;
-import api.requestobject.*;
+import api.requestobject.RequestGetUpdate;
+import api.requestobject.RequestGetUserProfilePhotos;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Main {
         // Get updates
         /*List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
         messageList.forEach((message -> {
-            System.out.println(message.getChat().getChatId());
+            System.out.println(message.getChat().getChatId() + " --- " + message.getFrom().getId());
         }));*/
 
         // Send Message
@@ -96,6 +96,12 @@ public class Main {
         // Send chat action
         /*RequestSendChatAction requestSendChatAction = new RequestSendChatAction(chat, ChatActionEnum.TYPING);
         boolean result = Bot.getInstance().sendChatAction(requestSendChatAction);*/
+
+        // Get user profile photos
+        RequestGetUserProfilePhotos requestGetUserProfilePhotos = new RequestGetUserProfilePhotos(74619619);
+        UserProfilePhoto userProfilePhoto = Bot.getInstance().getUserProfilePhotos(requestGetUserProfilePhotos);
+        System.out.println("count: " + userProfilePhoto.getTotalCount());
+        userProfilePhoto.getPhotos().forEach((item) -> item.forEach((photoSize) -> System.out.println(photoSize.getFileId())));
 
     }
 }

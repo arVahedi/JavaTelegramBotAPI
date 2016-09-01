@@ -1,6 +1,7 @@
 package api.requestobject;
 
 import api.entity.*;
+import api.enums.ParseModeEnum;
 
 /**
  * Created by Gladiator on 1/23/2016 AD.
@@ -12,7 +13,7 @@ public class RequestSendMessage {
     //endregion
 
     //region Optional Fields
-    private String parseMode; //Markdown or HTML; user ParseModeEnum class.
+    private ParseModeEnum parseMode; //Markdown or HTML; user ParseModeEnum class.
     private boolean disableWebPagePreview = false;
     private boolean disableNotification = false;
     private int replyToMessageId;
@@ -46,11 +47,11 @@ public class RequestSendMessage {
         this.text = text;
     }
 
-    public String getParseMode() {
+    public ParseModeEnum getParseMode() {
         return parseMode;
     }
 
-    public void setParseMode(String parseMode) {
+    public void setParseMode(ParseModeEnum parseMode) {
         this.parseMode = parseMode;
     }
 

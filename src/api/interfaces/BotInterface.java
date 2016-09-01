@@ -2,6 +2,7 @@ package api.interfaces;
 
 import api.entity.Message;
 import api.entity.User;
+import api.entity.UserProfilePhoto;
 import api.requestobject.*;
 
 import java.io.IOException;
@@ -30,12 +31,14 @@ public interface BotInterface {
 
     Message sendVoice(RequestSendVoice requestSendVoice) throws IOException;
 
-    Message sendLocation(RequestSendLocation requestSendLocation);
+    Message sendLocation(RequestSendLocation requestSendLocation) throws IOException;
 
-    Message sendVenue(RequestSendVenue requestSendVenue);
+    Message sendVenue(RequestSendVenue requestSendVenue) throws IOException;
 
-    Message sendContact(RequestSendContact requestSendContact);
+    Message sendContact(RequestSendContact requestSendContact) throws IOException;
 
-    boolean sendChatAction(RequestSendChatAction requestSendChatAction);
+    boolean sendChatAction(RequestSendChatAction requestSendChatAction) throws IOException;
+
+    UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException;
 
 }

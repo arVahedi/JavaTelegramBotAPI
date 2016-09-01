@@ -91,7 +91,7 @@ public class Bot implements BotInterface {
         sendMessageUrl = sendMessageUrl + "&disable_notification=" + requestSendMessage.isDisableNotification();
 
         if (requestSendMessage.getParseMode() != null) {
-            sendMessageUrl = sendMessageUrl + "&parse_mode=" + requestSendMessage.getParseMode();
+            sendMessageUrl = sendMessageUrl + "&parse_mode=" + requestSendMessage.getParseMode().value();
         }
         if (requestSendMessage.getReplyToMessageId() != 0) {
             sendMessageUrl = sendMessageUrl + "&reply_to_message_id=" + requestSendMessage.getReplyToMessageId();
@@ -562,7 +562,7 @@ public class Bot implements BotInterface {
      *
      * @return send Message is returned
      */
-    public Message sendLocation(RequestSendLocation requestSendLocation) {
+    public Message sendLocation(RequestSendLocation requestSendLocation) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendLocation?");
         HashMap<String, String> attributes = new HashMap<>();
 
@@ -589,12 +589,7 @@ public class Bot implements BotInterface {
         urlBuilder.append("chat_id=").append(chatId);
         attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
         SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
-        JSONObject jsonResponse;
-        try {
-            jsonResponse = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendLocationException(e.getMessage());
-        }
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
             return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
@@ -610,7 +605,7 @@ public class Bot implements BotInterface {
      *
      * @return send Message is returned
      */
-    public Message sendVenue(RequestSendVenue requestSendVenue) {
+    public Message sendVenue(RequestSendVenue requestSendVenue) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendVenue?");
         HashMap<String, String> attributes = new HashMap<>();
 
@@ -640,15 +635,10 @@ public class Bot implements BotInterface {
             attributes.put("foursquare_id", requestSendVenue.getVenue().getFoursquare_id());
         }
 
-        JSONObject jsonResponse;
         urlBuilder.append("chat_id=").append(chatId);
         attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
         SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
-        try {
-            jsonResponse = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendVenueException(e.getMessage());
-        }
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
             return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
@@ -664,7 +654,7 @@ public class Bot implements BotInterface {
      *
      * @return send Message is returned
      */
-    public Message sendContact(RequestSendContact requestSendContact) {
+    public Message sendContact(RequestSendContact requestSendContact) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendContact?");
         HashMap<String, String> attributes = new HashMap<>();
 
@@ -695,15 +685,10 @@ public class Bot implements BotInterface {
             throw new SendContactException("Contact object is null");
         }
 
-        JSONObject jsonResponse;
         urlBuilder.append("chat_id=").append(chatId);
         attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
         SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
-        try {
-            jsonResponse = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendContactException(e.getMessage());
-        }
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
             return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
@@ -721,7 +706,7 @@ public class Bot implements BotInterface {
      *
      * @return boolean
      */
-    public boolean sendChatAction(RequestSendChatAction requestSendChatAction) {
+    public boolean sendChatAction(RequestSendChatAction requestSendChatAction) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/sendChatAction?");
         HashMap<String, String> attributes = new HashMap<>();
 
@@ -734,21 +719,71 @@ public class Bot implements BotInterface {
 
         attributes.put("action", requestSendChatAction.getAction().value());
 
-        JSONObject jsonResponse;
         urlBuilder.append("chat_id=").append(chatId);
         attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
         SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
-        try {
-            jsonResponse = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
             return (boolean) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Boolean.class);
         } else {
             throw new SendChatActionException("Illegal Response.");
         }
+    }
+
+    /**
+     * Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
+     *
+     * @param requestGetUserProfilePhotos Request get user profile photos
+     *
+     * @return Returns a UserProfilePhotos object.
+     *
+     * @throws IOException
+     */
+    public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getUserProfilePhotos?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        urlBuilder.append("user_id=").append(requestGetUserProfilePhotos.getUser().getId());
+
+        if (requestGetUserProfilePhotos.getLimit() != 0) {
+            attributes.put("limit", String.valueOf(requestGetUserProfilePhotos.getLimit()));
+        }
+
+        if (requestGetUserProfilePhotos.getOffset() != 0) {
+            attributes.put("offset", String.valueOf(requestGetUserProfilePhotos.getOffset()));
+        }
+
+        attributes.forEach((key, value) -> urlBuilder.append("&").append(key).append("=").append(value));
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        UserProfilePhoto userProfilePhoto;
+        if ((boolean) jsonResponse.get("ok")) {
+            userProfilePhoto = (UserProfilePhoto) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), UserProfilePhoto.class);
+        } else {
+            throw new GetUserProfilePhotosException("Illegal Response.");
+        }
+
+        return userProfilePhoto;
+    }
+
+    public File getFile(RequestGetFile requestGetFile) throws IOException {
+        String getFileUrl = API_URL + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
+
+        SSLConnection sslConnection = new SSLConnection(getFileUrl);
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        File file;
+        if ((boolean) jsonResponse.get("ok")) {
+            Gson gson = new Gson();
+            file = gson.fromJson(jsonResponse.get("result").toString(), File.class);
+        } else {
+            //TODO: write telegram error message exception;
+            throw new GetFileException();
+        }
+
+        return file;
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
@@ -792,51 +827,6 @@ public class Bot implements BotInterface {
         }
 
         return listOfAllMessage;
-    }
-
-    public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
-        String getUserProfilePhotoUrl = API_URL + token + "/getUserProfilePhotos?user_id="
-                + requestGetUserProfilePhotos.getUser().getId();
-
-        if (requestGetUserProfilePhotos.getLimit() != 0) {
-            getUserProfilePhotoUrl = getUserProfilePhotoUrl + "&limit=" + requestGetUserProfilePhotos.getLimit();
-        }
-        if (requestGetUserProfilePhotos.getOffset() != 0) {
-            getUserProfilePhotoUrl = getUserProfilePhotoUrl + "&offset=" + requestGetUserProfilePhotos.getOffset();
-        }
-
-        SSLConnection sslConnection = new SSLConnection(getUserProfilePhotoUrl);
-
-        JSONObject jsonResponse = sslConnection.getSSLConnection();
-
-        UserProfilePhoto userProfilePhoto;
-        if ((boolean) jsonResponse.get("ok")) {
-            Gson gson = new Gson();
-            userProfilePhoto = gson.fromJson(jsonResponse.get("result").toString(), UserProfilePhoto.class);
-        } else {
-            //TODO: write telegram error message exception;
-            throw new GetUserProfilePhotosException();
-        }
-
-        return userProfilePhoto;
-    }
-
-    public File getFile(RequestGetFile requestGetFile) throws IOException {
-        String getFileUrl = API_URL + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
-
-        SSLConnection sslConnection = new SSLConnection(getFileUrl);
-        JSONObject jsonResponse = sslConnection.getSSLConnection();
-
-        File file;
-        if ((boolean) jsonResponse.get("ok")) {
-            Gson gson = new Gson();
-            file = gson.fromJson(jsonResponse.get("result").toString(), File.class);
-        } else {
-            //TODO: write telegram error message exception;
-            throw new GetFileException();
-        }
-
-        return file;
     }
 
     public void setWebHook(RequestSetWebHook requestSetWebHook) {
