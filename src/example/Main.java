@@ -1,9 +1,9 @@
 package example;
 
 import api.core.Bot;
-import api.entity.*;
-import api.requestobject.RequestGetUpdate;
-import api.requestobject.RequestGetUserProfilePhotos;
+import api.entity.Chat;
+import api.entity.KeyboardButton;
+import api.entity.ReplyKeyboardMarkup;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,10 +98,21 @@ public class Main {
         boolean result = Bot.getInstance().sendChatAction(requestSendChatAction);*/
 
         // Get user profile photos
-        RequestGetUserProfilePhotos requestGetUserProfilePhotos = new RequestGetUserProfilePhotos(74619619);
+        /*RequestGetUserProfilePhotos requestGetUserProfilePhotos = new RequestGetUserProfilePhotos(74619619);
         UserProfilePhoto userProfilePhoto = Bot.getInstance().getUserProfilePhotos(requestGetUserProfilePhotos);
         System.out.println("count: " + userProfilePhoto.getTotalCount());
-        userProfilePhoto.getPhotos().forEach((item) -> item.forEach((photoSize) -> System.out.println(photoSize.getFileId())));
-
+        RequestGetFile requestGetFile = new RequestGetFile();
+        userProfilePhoto.getPhotos().forEach((item) -> {
+            item.forEach((photoSize) -> {
+                System.out.println(photoSize.getFileId());
+                requestGetFile.setFile(new File(photoSize.getFileId()));
+                try {
+                    File file = Bot.getInstance().getFile(requestGetFile);
+                    System.out.println(file.getFile_id() + " --- " + file.getFile_path());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        });*/
     }
 }

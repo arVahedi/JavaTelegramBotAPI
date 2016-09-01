@@ -768,6 +768,23 @@ public class Bot implements BotInterface {
         return userProfilePhoto;
     }
 
+    /**
+     * Use this method to get basic info about a file and prepare it for downloading. For the moment,
+     * bots can download files of up to 20MB in size.
+     * On success, a File object is returned.
+     * The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path>
+     * is taken from the response. It is guaranteed that the link will be valid for at least 1 hour.
+     * When the link expires, a new one can be requested by calling getFile again.
+     *
+     * Note: This function may not preserve original file name. Mime type of the file and its name (if available) should be
+     * saved when the File object is received.
+     *
+     * @param requestGetFile Request get file
+     *
+     * @return On success, a File object is returned.
+     *
+     * @throws IOException
+     */
     public File getFile(RequestGetFile requestGetFile) throws IOException {
         String getFileUrl = API_URL + token + "/getFile?file_id=" + requestGetFile.getFile().getFile_id();
 
@@ -776,11 +793,9 @@ public class Bot implements BotInterface {
 
         File file;
         if ((boolean) jsonResponse.get("ok")) {
-            Gson gson = new Gson();
-            file = gson.fromJson(jsonResponse.get("result").toString(), File.class);
+            file = (File) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), File.class);
         } else {
-            //TODO: write telegram error message exception;
-            throw new GetFileException();
+            throw new GetFileException("Illegal Response.");
         }
 
         return file;

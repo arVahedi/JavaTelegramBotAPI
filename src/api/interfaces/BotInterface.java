@@ -1,5 +1,6 @@
 package api.interfaces;
 
+import api.entity.File;
 import api.entity.Message;
 import api.entity.User;
 import api.entity.UserProfilePhoto;
@@ -40,5 +41,7 @@ public interface BotInterface {
     boolean sendChatAction(RequestSendChatAction requestSendChatAction) throws IOException;
 
     UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException;
+
+    File getFile(RequestGetFile requestGetFile) throws IOException;
 
 }

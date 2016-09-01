@@ -3,17 +3,22 @@ package api.entity;
 import java.io.Serializable;
 
 public class File implements Serializable {
+    //region Fields
     private String file_id;
     private int file_size;
     private String file_path;
+    //endregion
 
+    //region Constructors
     public File() {
     }
 
     public File(String fileId) {
         this.file_id = fileId;
     }
+    //endregion
 
+    //region Getter and Setter
     public String getFile_id() {
         return file_id;
     }
@@ -37,4 +42,5 @@ public class File implements Serializable {
     public void setFile_path(String file_path) {
         this.file_path = file_path;
     }
+    //endregion
 }
