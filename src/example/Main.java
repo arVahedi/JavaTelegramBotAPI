@@ -1,9 +1,10 @@
 package example;
 
 import api.core.Bot;
-import api.entity.Chat;
-import api.entity.KeyboardButton;
-import api.entity.ReplyKeyboardMarkup;
+import api.entity.*;
+import api.requestobject.RequestDownloadFile;
+import api.requestobject.RequestGetFile;
+import api.requestobject.RequestGetUserProfilePhotos;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,11 +98,13 @@ public class Main {
         /*RequestSendChatAction requestSendChatAction = new RequestSendChatAction(chat, ChatActionEnum.TYPING);
         boolean result = Bot.getInstance().sendChatAction(requestSendChatAction);*/
 
-        // Get user profile photos
+        // Get user profile photos and download files.
         /*RequestGetUserProfilePhotos requestGetUserProfilePhotos = new RequestGetUserProfilePhotos(74619619);
         UserProfilePhoto userProfilePhoto = Bot.getInstance().getUserProfilePhotos(requestGetUserProfilePhotos);
         System.out.println("count: " + userProfilePhoto.getTotalCount());
         RequestGetFile requestGetFile = new RequestGetFile();
+        RequestDownloadFile requestDownloadFile = new RequestDownloadFile();
+        requestDownloadFile.setPath("/Users/Gladiator/Desktop/TelegramBotApi/out");
         userProfilePhoto.getPhotos().forEach((item) -> {
             item.forEach((photoSize) -> {
                 System.out.println(photoSize.getFileId());
@@ -109,10 +112,14 @@ public class Main {
                 try {
                     File file = Bot.getInstance().getFile(requestGetFile);
                     System.out.println(file.getFile_id() + " --- " + file.getFile_path());
+                    requestDownloadFile.setUri(file.getFile_path());
+                    Bot.getInstance().downloadFile(requestDownloadFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
         });*/
+
+
     }
 }

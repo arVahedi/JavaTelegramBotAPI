@@ -9,7 +9,6 @@ import api.requestobject.*;
 import java.io.IOException;
 
 /**
- *
  * Created by Gladiator on 8/26/2016 AD.
  */
 public interface BotInterface {
@@ -43,5 +42,7 @@ public interface BotInterface {
     UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException;
 
     File getFile(RequestGetFile requestGetFile) throws IOException;
+
+    void downloadFile(RequestDownloadFile requestDownloadFile) throws IOException;
 
 }

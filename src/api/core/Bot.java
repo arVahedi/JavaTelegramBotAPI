@@ -13,7 +13,11 @@ import api.requestobject.*;
 import api.utilities.JsonUtil;
 import com.google.gson.Gson;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +36,7 @@ public class Bot implements BotInterface {
     private static Bot instance = null;
 
     private final static String API_URL = "https://api.telegram.org/bot";
+    private final static String API_DOWNLOAD_FILE_URL = "https://api.telegram.org/file/bot";
 
     private Bot(String token) {
         Bot.token = token;
@@ -775,7 +780,7 @@ public class Bot implements BotInterface {
      * The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path>
      * is taken from the response. It is guaranteed that the link will be valid for at least 1 hour.
      * When the link expires, a new one can be requested by calling getFile again.
-     *
+     * <p>
      * Note: This function may not preserve original file name. Mime type of the file and its name (if available) should be
      * saved when the File object is received.
      *
@@ -799,6 +804,64 @@ public class Bot implements BotInterface {
         }
 
         return file;
+    }
+
+    /**
+     * Use this method for download file from Telegram server.
+     * for get link of file you can use {@link #getFile(RequestGetFile) getFile} method.
+     *
+     * @param requestDownloadFile Request Download file
+     *
+     * @throws IOException
+     */
+    public void downloadFile(RequestDownloadFile requestDownloadFile) throws IOException {
+        URL url = new URL(API_DOWNLOAD_FILE_URL + token + "/" + requestDownloadFile.getUri());
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        int responseCode = httpConn.getResponseCode();
+
+        // always check HTTP response code first
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String fileName = "";
+            String disposition = httpConn.getHeaderField("Content-Disposition");
+            String contentType = httpConn.getContentType();
+            int contentLength = httpConn.getContentLength();
+
+            if (requestDownloadFile.getName() != null) {
+                fileName = requestDownloadFile.getName();
+            } else if (disposition != null) {
+                // extracts file name from header field
+                int index = disposition.indexOf("filename=");
+                if (index > 0) {
+                    fileName = disposition.substring(index + 10,
+                            disposition.length() - 1);
+                }
+            } else {
+                // extracts file name from URL
+                fileName = requestDownloadFile.getUri().substring(
+                        requestDownloadFile.getUri().lastIndexOf("/") + 1,
+                        requestDownloadFile.getUri().length()
+                );
+            }
+
+            // opens input stream from the HTTP connection
+            InputStream inputStream = httpConn.getInputStream();
+            String saveFilePath = requestDownloadFile.getPath() + java.io.File.separator + fileName;
+
+            // opens an output stream to save into file
+            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+
+            int bytesRead = -1;
+            byte[] buffer = new byte[4096];
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            outputStream.close();
+            inputStream.close();
+        } else {
+            throw new DownloadFileException("No file to download. May be download link expired. Server replied HTTP code: " + responseCode);
+        }
+        httpConn.disconnect();
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
