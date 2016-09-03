@@ -3,6 +3,7 @@ package example;
 import api.core.Bot;
 import api.entity.*;
 import api.requestobject.RequestDownloadFile;
+import api.requestobject.RequestGetChat;
 import api.requestobject.RequestGetFile;
 import api.requestobject.RequestGetUserProfilePhotos;
 
@@ -120,6 +121,8 @@ public class Main {
             });
         });*/
 
+        // Get chat
+        /*Chat chat1 = Bot.getInstance().getChat(new RequestGetChat(chat));*/
 
     }
 }

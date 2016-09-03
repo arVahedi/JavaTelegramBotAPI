@@ -1,9 +1,6 @@
 package api.core;
 
-import api.entity.File;
-import api.entity.Message;
-import api.entity.User;
-import api.entity.UserProfilePhoto;
+import api.entity.*;
 import api.exception.*;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
@@ -967,6 +964,34 @@ public class Bot implements BotInterface {
             return true;
         } else {
             throw new UnbanChatMemberException("Illegal Response.");
+        }
+    }
+
+    /**
+     * Use this method to get up to date information about the chat (current name of the user for one-on-one conversations,
+     * current username of a user, group or channel, etc.). Returns a Chat object on success.
+     *
+     * @param requestGetChat Request get chat
+     *
+     * @return Returns a Chat object on success.
+     */
+    public Chat getChat(RequestGetChat requestGetChat) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChat?");
+
+        String chatId;
+        if (requestGetChat.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestGetChat.getChat().getChatId());
+        } else {
+            throw new GetChatException("Chat id or chat username is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (Chat) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Chat.class);
+        } else {
+            throw new GetChatException("Illegal Response.");
         }
     }
 

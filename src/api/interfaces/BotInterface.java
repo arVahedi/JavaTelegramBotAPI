@@ -1,9 +1,6 @@
 package api.interfaces;
 
-import api.entity.File;
-import api.entity.Message;
-import api.entity.User;
-import api.entity.UserProfilePhoto;
+import api.entity.*;
 import api.requestobject.*;
 
 import java.io.IOException;
@@ -50,5 +47,7 @@ public interface BotInterface {
     boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException;
 
     boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException;
+
+    Chat getChat(RequestGetChat requestGetChat) throws IOException;
 
 }
