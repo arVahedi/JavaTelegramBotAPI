@@ -933,8 +933,41 @@ public class Bot implements BotInterface {
         }
     }
 
-    public boolean unbanChatMember() {
-        return true;
+    /**
+     * Use this method to unban a previously kicked user in a supergroup.
+     * The user will not return to the group automatically, but will be able to join via link, etc.
+     * The bot must be an administrator in the group for this to work. Returns True on success.
+     *
+     * @param requestUnbanChatMember Request unban chat member
+     *
+     * @return Returns True on success.
+     *
+     * @throws IOException
+     */
+    public boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/unbanChatMember?");
+
+        String chatId;
+        if (requestUnbanChatMember.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestUnbanChatMember.getChat().getChatId());
+        } else {
+            throw new UnbanChatMemberException("Chat id or chat username is null");
+        }
+
+        if (requestUnbanChatMember.getUser() != null && requestUnbanChatMember.getUser().getId() != 0) {
+            urlBuilder.append("&user_id=").append(requestUnbanChatMember.getUser().getId());
+        } else {
+            throw new UnbanChatMemberException("User id is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new UnbanChatMemberException("Illegal Response.");
+        }
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {

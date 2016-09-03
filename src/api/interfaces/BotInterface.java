@@ -49,4 +49,6 @@ public interface BotInterface {
 
     boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException;
 
+    boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException;
+
 }
