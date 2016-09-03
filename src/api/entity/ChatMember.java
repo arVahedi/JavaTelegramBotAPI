@@ -14,22 +14,23 @@ public class ChatMember implements Serializable {
     //endregion
 
     //region Constructors
-    public ChatMember(){}
+    public ChatMember() {
+    }
 
-    public ChatMember(User user){
+    public ChatMember(User user) {
         this.user = user;
     }
 
-    public ChatMember(int userId){
+    public ChatMember(int userId) {
         this.user = new User(userId);
     }
 
-    public ChatMember(User user, ChatMemberStatusEnum status){
+    public ChatMember(User user, ChatMemberStatusEnum status) {
         this(user);
         this.status = status;
     }
 
-    public ChatMember(int userId, ChatMemberStatusEnum status){
+    public ChatMember(int userId, ChatMemberStatusEnum status) {
         this(userId);
         this.status = status;
     }

@@ -2,10 +2,7 @@ package example;
 
 import api.core.Bot;
 import api.entity.*;
-import api.requestobject.RequestDownloadFile;
-import api.requestobject.RequestGetChat;
-import api.requestobject.RequestGetFile;
-import api.requestobject.RequestGetUserProfilePhotos;
+import api.requestobject.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -123,6 +120,9 @@ public class Main {
 
         // Get chat
         /*Chat chat1 = Bot.getInstance().getChat(new RequestGetChat(chat));*/
+
+        // Get Chat Administrators
+        Bot.getInstance().getChatAdministrators(new RequestGetChatAdministrators(new Chat(-169011245)));
 
     }
 }

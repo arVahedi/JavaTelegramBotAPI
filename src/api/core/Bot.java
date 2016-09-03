@@ -878,7 +878,6 @@ public class Bot implements BotInterface {
     public boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/kickChatMember?");
 
-        String chatId;
         if (requestKickChatMember.getChat().isValid()) {
             urlBuilder.append("chat_id=").append(requestKickChatMember.getChat().getChatId());
         } else {
@@ -913,7 +912,6 @@ public class Bot implements BotInterface {
     public boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/leaveChat?");
 
-        String chatId;
         if (requestLeaveChat.getChat().isValid()) {
             urlBuilder.append("chat_id=").append(requestLeaveChat.getChat().getChatId());
         } else {
@@ -944,7 +942,6 @@ public class Bot implements BotInterface {
     public boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/unbanChatMember?");
 
-        String chatId;
         if (requestUnbanChatMember.getChat().isValid()) {
             urlBuilder.append("chat_id=").append(requestUnbanChatMember.getChat().getChatId());
         } else {
@@ -978,7 +975,6 @@ public class Bot implements BotInterface {
     public Chat getChat(RequestGetChat requestGetChat) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChat?");
 
-        String chatId;
         if (requestGetChat.getChat().isValid()) {
             urlBuilder.append("chat_id=").append(requestGetChat.getChat().getChatId());
         } else {
@@ -993,6 +989,34 @@ public class Bot implements BotInterface {
         } else {
             throw new GetChatException("Illegal Response.");
         }
+    }
+
+    public List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChatAdministrators?");
+
+        if (requestGetChatAdministrators.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestGetChatAdministrators.getChat().getChatId());
+        } else {
+            throw new GetChatAdministratorsException("Chat id or chat username is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        List<ChatMember> listOfAdmins = new ArrayList<>();
+        if ((boolean) jsonResponse.get("ok")) {
+            // TODO: 9/4/2016 AD fill status field in ChatMember class.
+            // TODO: 9/4/2016 AD Countinue here.
+            jsonResponse.getJSONArray("result").forEach((key) -> listOfAdmins.add((ChatMember) JsonUtil.fromJsonSerializable(
+                    key.toString(), ChatMember.class
+            )));
+
+
+        } else {
+            throw new GetChatAdministratorsException("Illegal Response.");
+        }
+
+        return listOfAdmins;
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {

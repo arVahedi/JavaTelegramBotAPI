@@ -12,11 +12,11 @@ public enum ChatMemberStatusEnum {
 
     private String value;
 
-    ChatMemberStatusEnum(String value){
+    ChatMemberStatusEnum(String value) {
         this.value = value;
     }
 
-    public String value(){
+    public String value() {
         return this.value;
     }
 }
