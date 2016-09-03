@@ -864,6 +864,46 @@ public class Bot implements BotInterface {
         httpConn.disconnect();
     }
 
+    /**
+     * Use this method to kick a user from a group or a supergroup.
+     * In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc.
+     * unless unbanned first. The bot must be an administrator in the group for this to work. Returns True on success.
+     * <p>
+     * Note: This will method only work if the ‘All Members Are Admins’ setting is off in the target group.
+     * Otherwise members may only be removed by the group's creator or by the member that added them.
+     *
+     * @param requestKickChatMember Request kick chat member
+     *
+     * @return True on success
+     *
+     * @throws IOException
+     */
+    public boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/kickChatMember?");
+
+        String chatId;
+        if (requestKickChatMember.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestKickChatMember.getChat().getChatId());
+        } else {
+            throw new KickChatMemberException("Chat id or chat username is null");
+        }
+
+        if (requestKickChatMember.getUser() != null && requestKickChatMember.getUser().getId() != 0) {
+            urlBuilder.append("&user_id=").append(requestKickChatMember.getUser().getId());
+        } else {
+            throw new KickChatMemberException("User id is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new SendVenueException("Illegal Response.");
+        }
+    }
+
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
         String updateUrl = API_URL + token + "/getUpdates?";
 

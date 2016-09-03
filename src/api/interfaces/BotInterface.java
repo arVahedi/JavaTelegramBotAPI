@@ -45,4 +45,6 @@ public interface BotInterface {
 
     void downloadFile(RequestDownloadFile requestDownloadFile) throws IOException;
 
+    boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException;
+
 }
