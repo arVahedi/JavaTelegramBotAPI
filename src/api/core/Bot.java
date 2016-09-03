@@ -900,8 +900,41 @@ public class Bot implements BotInterface {
         if ((boolean) jsonResponse.get("ok")) {
             return true;
         } else {
-            throw new SendVenueException("Illegal Response.");
+            throw new KickChatMemberException("Illegal Response.");
         }
+    }
+
+    /**
+     * Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
+     *
+     * @param requestLeaveChat Request leave chat
+     *
+     * @return Returns True on success.
+     *
+     * @throws IOException
+     */
+    public boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/leaveChat?");
+
+        String chatId;
+        if (requestLeaveChat.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestLeaveChat.getChat().getChatId());
+        } else {
+            throw new LeaveChatException("Chat id or chat username is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new LeaveChatException("Illegal Response.");
+        }
+    }
+
+    public boolean unbanChatMember() {
+        return true;
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {

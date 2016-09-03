@@ -47,4 +47,6 @@ public interface BotInterface {
 
     boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException;
 
+    boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException;
+
 }

@@ -23,7 +23,7 @@ public class RequestKickChatMember implements Serializable {
         this.user = user;
     }
 
-    public RequestKickChatMember(int chatId, int userId) {
+    public RequestKickChatMember(Object chatId, int userId) {
         this.chat = new Chat(chatId);
         this.user = new User(userId);
     }
@@ -36,7 +36,7 @@ public class RequestKickChatMember implements Serializable {
         this.user = user;
     }
 
-    public RequestKickChatMember(int chatId) {
+    public RequestKickChatMember(Object chatId) {
         this.chat = new Chat(chatId);
     }
     //endregion
