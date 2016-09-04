@@ -1023,13 +1023,41 @@ public class Bot implements BotInterface {
                 listOfAdmins.add(member);
 
             });
-
-
         } else {
             throw new GetChatAdministratorsException("Illegal Response.");
         }
 
         return listOfAdmins;
+    }
+
+    /**
+     * Use this method to get the number of members in a chat. Returns Int on success.
+     *
+     * @param requestGetChatMembersCount Request get chat members count
+     *
+     * @return Returns Int on success.
+     *
+     * @throws IOException
+     */
+    public int getChatMembersCount(RequestGetChatMembersCount requestGetChatMembersCount) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChatMembersCount?");
+
+        if (requestGetChatMembersCount.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestGetChatMembersCount.getChat().getChatId());
+        } else {
+            throw new GetChatMembersCountException("Chat id and chat username is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return (int) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Integer.class);
+
+        } else {
+            throw new GetChatAdministratorsException("Illegal Response.");
+        }
+
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {

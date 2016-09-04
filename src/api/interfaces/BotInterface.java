@@ -53,4 +53,6 @@ public interface BotInterface {
 
     List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException;
 
+    int getChatMembersCount(RequestGetChatMembersCount requestGetChatMembersCount) throws IOException;
+
 }

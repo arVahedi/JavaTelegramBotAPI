@@ -6,6 +6,7 @@ import api.entity.KeyboardButton;
 import api.entity.Message;
 import api.entity.ReplyKeyboardMarkup;
 import api.requestobject.RequestGetChatAdministrators;
+import api.requestobject.RequestGetChatMembersCount;
 import api.requestobject.RequestGetUpdate;
 
 import java.io.IOException;
@@ -40,10 +41,10 @@ public class Main {
 
 
         // Get updates
-        List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
+        /*List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
         messageList.forEach((message -> {
-            System.out.println(message.getChat().getChatId() + " --- " + message.getChat().getType());
-        }));
+            System.out.println(message.getChat().getChatId() + " --- " + message.getText());
+        }));*/
 
         // Send Message
         /*RequestSendMessage requestSendMessage = new RequestSendMessage(new Chat(74619619), "Amnafzar Co.");
@@ -126,7 +127,10 @@ public class Main {
         /*Chat chat1 = Bot.getInstance().getChat(new RequestGetChat(chat));*/
 
         // Get Chat Administrators
-        Bot.getInstance().getChatAdministrators(new RequestGetChatAdministrators(new Chat(-169011245)));
+        /*Bot.getInstance().getChatAdministrators(new RequestGetChatAdministrators(new Chat(-169011245)));*/
+
+        // Get chat members count
+        /*int count = Bot.getInstance().getChatMembersCount(new RequestGetChatMembersCount(new Chat(-169011245)));*/
 
     }
 }
