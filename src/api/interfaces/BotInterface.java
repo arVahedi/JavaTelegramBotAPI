@@ -4,6 +4,7 @@ import api.entity.*;
 import api.requestobject.*;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Gladiator on 8/26/2016 AD.
@@ -49,5 +50,7 @@ public interface BotInterface {
     boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException;
 
     Chat getChat(RequestGetChat requestGetChat) throws IOException;
+
+    List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException;
 
 }

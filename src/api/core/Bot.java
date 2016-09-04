@@ -1,6 +1,7 @@
 package api.core;
 
 import api.entity.*;
+import api.enums.ChatMemberStatusEnum;
 import api.exception.*;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
@@ -991,6 +992,17 @@ public class Bot implements BotInterface {
         }
     }
 
+    /**
+     * Use this method to get a list of administrators in a chat.
+     * On success, returns an Array of ChatMember objects that contains information about all chat administrators except other bots.
+     * If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
+     *
+     * @param requestGetChatAdministrators Request get chat administrators
+     *
+     * @return returns an Array of ChatMember objects
+     *
+     * @throws IOException
+     */
     public List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChatAdministrators?");
 
@@ -1005,11 +1017,12 @@ public class Bot implements BotInterface {
 
         List<ChatMember> listOfAdmins = new ArrayList<>();
         if ((boolean) jsonResponse.get("ok")) {
-            // TODO: 9/4/2016 AD fill status field in ChatMember class.
-            // TODO: 9/4/2016 AD Countinue here.
-            jsonResponse.getJSONArray("result").forEach((key) -> listOfAdmins.add((ChatMember) JsonUtil.fromJsonSerializable(
-                    key.toString(), ChatMember.class
-            )));
+            jsonResponse.getJSONArray("result").forEach((key) -> {
+                ChatMember member = (ChatMember) JsonUtil.fromJsonSerializable(key.toString(), ChatMember.class);
+                member.setStatus(ChatMemberStatusEnum.valueOf(((JSONObject) key).get("status").toString().toUpperCase()));
+                listOfAdmins.add(member);
+
+            });
 
 
         } else {
@@ -1046,16 +1059,13 @@ public class Bot implements BotInterface {
 
         List<Message> listOfAllMessage = new ArrayList<Message>();
         if ((boolean) jsonResponse.get("ok")) {
-            Gson gson = new Gson();
 
-            for (int counter = 0; counter < jsonResponse.getJSONArray("result").length(); counter++) {
-                Message message = gson.fromJson(jsonResponse.getJSONArray("result").getJSONObject(counter).get("message").toString()
-                        , Message.class);
-                message.setUpdateId((Integer) jsonResponse.getJSONArray("result").getJSONObject(counter).get("update_id"));
+            jsonResponse.getJSONArray("result").forEach((key) -> {
+                Message message = (Message) JsonUtil.fromJsonSerializable(((JSONObject) key).get("message").toString(), Message.class);
+                message.setUpdateId((Integer) ((JSONObject) key).get("update_id"));
                 listOfAllMessage.add(message);
-            }
+            });
         } else {
-            //TODO: write telegram error message in exception;
             throw new GetUpdateException();
         }
 

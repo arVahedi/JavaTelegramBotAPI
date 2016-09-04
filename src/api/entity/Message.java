@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Message implements Serializable {
-    private int message_id;
+    private long message_id;
     private User from;
     private int date;
     private Chat chat;
@@ -34,17 +34,17 @@ public class Message implements Serializable {
     private boolean group_chat_created;
     private boolean supergroup_chat_created;
     private boolean channel_chat_created;
-    private int migrate_to_chat_id;
-    private int migrate_from_chat_id;
+    private long migrate_to_chat_id;
+    private long migrate_from_chat_id;
     private Message pinned_message;
 
     private int updateId;
 
-    public int getMessageId() {
+    public long getMessageId() {
         return message_id;
     }
 
-    public void setMessageId(int messageId) {
+    public void setMessageId(long messageId) {
         this.message_id = messageId;
     }
 
@@ -240,19 +240,19 @@ public class Message implements Serializable {
         this.channel_chat_created = channel_chat_created;
     }
 
-    public int getMigrate_to_chat_id() {
+    public long getMigrate_to_chat_id() {
         return migrate_to_chat_id;
     }
 
-    public void setMigrate_to_chat_id(int migrate_to_chat_id) {
+    public void setMigrate_to_chat_id(long migrate_to_chat_id) {
         this.migrate_to_chat_id = migrate_to_chat_id;
     }
 
-    public int getMigrate_from_chat_id() {
+    public long getMigrate_from_chat_id() {
         return migrate_from_chat_id;
     }
 
-    public void setMigrate_from_chat_id(int migrate_from_chat_id) {
+    public void setMigrate_from_chat_id(long migrate_from_chat_id) {
         this.migrate_from_chat_id = migrate_from_chat_id;
     }
 
