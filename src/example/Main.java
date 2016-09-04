@@ -1,12 +1,8 @@
 package example;
 
 import api.core.Bot;
-import api.entity.Chat;
-import api.entity.KeyboardButton;
-import api.entity.Message;
-import api.entity.ReplyKeyboardMarkup;
-import api.requestobject.RequestGetChatAdministrators;
-import api.requestobject.RequestGetChatMembersCount;
+import api.entity.*;
+import api.requestobject.RequestGetChatMember;
 import api.requestobject.RequestGetUpdate;
 
 import java.io.IOException;
@@ -43,7 +39,7 @@ public class Main {
         // Get updates
         /*List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
         messageList.forEach((message -> {
-            System.out.println(message.getChat().getChatId() + " --- " + message.getText());
+            System.out.println(message.getChat().getChatId() + " --- " + message.getFrom().getId());
         }));*/
 
         // Send Message
@@ -131,6 +127,10 @@ public class Main {
 
         // Get chat members count
         /*int count = Bot.getInstance().getChatMembersCount(new RequestGetChatMembersCount(new Chat(-169011245)));*/
+
+        // Get chat member
+        /*ChatMember chatMember = Bot.getInstance().getChatMember(new RequestGetChatMember(new Chat(-1001093498802L), new User(74619619)));*/
+
 
     }
 }

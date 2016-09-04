@@ -17,11 +17,11 @@ public class Chat implements Serializable {
     public Chat() {
     }
 
-    public Chat(int id) {
+    public Chat(long id) {
         this.id = id;
     }
 
-    public Chat(long id) {
+    public Chat(int id) {
         this.id = id;
     }
     //endregion

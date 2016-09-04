@@ -27,6 +27,7 @@ import java.util.List;
  * Updated for (May 25, 2016)
  */
 public class Bot implements BotInterface {
+    //region Fields
     private String id;
     private String username;
     private static String token;
@@ -35,10 +36,13 @@ public class Bot implements BotInterface {
 
     private final static String API_URL = "https://api.telegram.org/bot";
     private final static String API_DOWNLOAD_FILE_URL = "https://api.telegram.org/file/bot";
+    //endregion
 
+    //region Constructors
     private Bot(String token) {
         Bot.token = token;
     }
+    //endregion
 
     public static Bot getInstance() {
         if (instance == null) {
@@ -47,6 +51,8 @@ public class Bot implements BotInterface {
 
         return instance;
     }
+
+    //region Bot action
 
     /**
      * A simple method for testing your bot's auth token.
@@ -1055,9 +1061,49 @@ public class Bot implements BotInterface {
             return (int) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Integer.class);
 
         } else {
-            throw new GetChatAdministratorsException("Illegal Response.");
+            throw new GetChatMembersCountException("Illegal Response.");
         }
 
+    }
+
+    /**
+     * Use this method to get information about a member of a chat. Returns a ChatMember object on success.
+     *
+     * @param requestGetChatMember Request get chat member
+     *
+     * @return Returns a ChatMember object on success.
+     *
+     * @throws IOException
+     */
+    public ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/getChatMember?");
+
+        if (requestGetChatMember.getChat().isValid()) {
+            urlBuilder.append("chat_id=").append(requestGetChatMember.getChat().getChatId());
+        } else {
+            throw new GetChatMemberException("Chat id or chat username is null");
+        }
+
+        if (requestGetChatMember.getUser() != null && requestGetChatMember.getUser().getId() != 0) {
+            urlBuilder.append("&user_id=").append(requestGetChatMember.getUser().getId());
+        } else {
+            throw new GetChatMemberException("User id is null");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            ChatMember chatMember = (ChatMember) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), ChatMember.class);
+            chatMember.setStatus(ChatMemberStatusEnum.valueOf(jsonResponse.getJSONObject("result").get("status").toString().toUpperCase()));
+            return chatMember;
+        } else {
+            throw new GetChatMemberException("Illegal Response.");
+        }
+    }
+
+    public boolean answerCallbackQuery() {
+        return true;
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
@@ -1112,9 +1158,9 @@ public class Bot implements BotInterface {
             throw new SendChatActionException(e.getMessage());
         }
     }
+    //endregion
 
-    //TODO: other method for bot telegram entity;
-
+    //region Getter and Setter
     public String getId() {
         return id;
     }
@@ -1138,4 +1184,5 @@ public class Bot implements BotInterface {
     public static void setToken(String token) {
         Bot.token = token;
     }
+    //endregion
 }

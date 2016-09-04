@@ -55,4 +55,6 @@ public interface BotInterface {
 
     int getChatMembersCount(RequestGetChatMembersCount requestGetChatMembersCount) throws IOException;
 
+    ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException;
+
 }
