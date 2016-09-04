@@ -57,4 +57,6 @@ public interface BotInterface {
 
     ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException;
 
+    boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException;
+
 }

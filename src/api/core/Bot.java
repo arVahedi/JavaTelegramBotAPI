@@ -1102,8 +1102,39 @@ public class Bot implements BotInterface {
         }
     }
 
-    public boolean answerCallbackQuery() {
-        return true;
+    /**
+     * Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed
+     * to the user as a notification at the top of the chat screen or as an alert. On success, True is returned.
+     *
+     * @param requestAnswerCallbackQuery Request answer callback query
+     *
+     * @return On success, True is returned.
+     *
+     * @throws IOException
+     */
+    public boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/answerCallbackQuery?");
+
+        if (requestAnswerCallbackQuery.getCallbackQuery() == null || requestAnswerCallbackQuery.getCallbackQuery().getId() == null) {
+            throw new AnswerCallbackQueryException("CallbackQuery id is null");
+        }
+
+        urlBuilder.append("callback_query_id=").append(requestAnswerCallbackQuery.getCallbackQuery().getId());
+
+        if (requestAnswerCallbackQuery.getText() != null) {
+            urlBuilder.append("&text=").append(requestAnswerCallbackQuery.getText());
+        }
+
+        urlBuilder.append("&show_alert=").append(requestAnswerCallbackQuery.isShowAlert());
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new AnswerCallbackQueryException("Illegal Response.");
+        }
     }
 
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
