@@ -108,11 +108,47 @@ public class Bot implements BotInterface {
     }
 
     /**
+     * Use this method to specify a url and receive incoming updates via an outgoing webhook.
+     * Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+     * containing a JSON-serialized Update. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+     * <p>
+     * If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL,
+     * e.g. https://www.example.com/<token>. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
+     * <p>
+     * Notes :
+     * 1. You will not be able to receive updates using getUpdates for as long as an outgoing webhook is set up.
+     * 2. To use a self-signed certificate, you need to upload your public key certificate using certificate parameter. Please upload as InputFile, sending a String will not work.
+     * 3. Ports currently supported for Webhooks: 443, 80, 88, 8443.
+     *
+     * @param requestSetWebHook Request set webhook
+     * @return
+     * @throws IOException
+     */
+    public boolean setWebHook(RequestSetWebHook requestSetWebHook) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/setWebhook?");
+        HashMap<String, String> attributes = new HashMap<>();
+
+        attributes.put("url", requestSetWebHook.getUrl());
+
+        HashMap<String, java.io.File> fileMap = new HashMap<>(1);
+        fileMap.put("certificate", new java.io.File(requestSetWebHook.getCertificate().getPath()));
+        MultipartFormData multipartFormData = new MultipartFormData(urlBuilder.toString(), attributes, fileMap);
+        multipartFormData.initialize();
+        JSONObject jsonResponse = multipartFormData.send();
+
+        /*if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new SetWebhookException("Illegal Response.");
+        }*/
+        return true;
+    }
+
+    /**
      * A simple method for testing your bot's auth token.
      * Requires no parameters. Returns basic information about the bot in form of a User object.
      *
      * @return {@link api.entity.User User} - Basic information about the bot
-     *
      * @throws IOException
      */
     public User getMe() throws IOException {
@@ -132,9 +168,7 @@ public class Bot implements BotInterface {
      * Use this method to send text messages. On success, the sent Message is returned.
      *
      * @param requestSendMessage request send message
-     *
      * @return Message - The send message is returned.
-     *
      * @throws IOException
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
@@ -179,9 +213,7 @@ public class Bot implements BotInterface {
      * Use this method to forward messages of any kind. On success, the sent Message is returned.
      *
      * @param requestForwardMessage Request forward message
-     *
      * @return send Message is returned.
-     *
      * @throws IOException
      */
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
@@ -215,9 +247,7 @@ public class Bot implements BotInterface {
      * Use this method to send photos. On success, the sent Message is returned.
      *
      * @param requestSendPhoto Request send photo
-     *
      * @return send Message is returned.
-     *
      * @throws IOException
      */
     public Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException {
@@ -280,9 +310,7 @@ public class Bot implements BotInterface {
      * Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendAudio Request send audio
-     *
      * @return send Message is returned
-     *
      * @throws IOException
      */
     public Message sendAudio(RequestSendAudio requestSendAudio) throws IOException {
@@ -352,9 +380,7 @@ public class Bot implements BotInterface {
      * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendDocument Request send document
-     *
      * @return send Message is returned
-     *
      * @throws IOException
      */
     public Message sendDocument(RequestSendDocument requestSendDocument) throws IOException {
@@ -415,9 +441,7 @@ public class Bot implements BotInterface {
      * Use this method to send .webp stickers. On success, the sent Message is returned.
      *
      * @param requestSendSticker Request send sticker
-     *
      * @return send Message is returned
-     *
      * @throws IOException
      */
     public Message sendSticker(RequestSendSticker requestSendSticker) throws IOException {
@@ -476,9 +500,7 @@ public class Bot implements BotInterface {
      * this limit may be changed in the future.
      *
      * @param requestSendVideo Request send video
-     *
      * @return send Message is returned
-     *
      * @throws IOException
      */
     public Message sendVideo(RequestSendVideo requestSendVideo) throws IOException {
@@ -556,9 +578,7 @@ public class Bot implements BotInterface {
      * this limit may be changed in the future.
      *
      * @param requestSendVoice Request send voice
-     *
      * @return send Message is returned
-     *
      * @throws IOException
      */
     public Message sendVoice(RequestSendVoice requestSendVoice) throws IOException {
@@ -621,7 +641,6 @@ public class Bot implements BotInterface {
      * Use this method to send point on the map. On success, the sent Message is returned.
      *
      * @param requestSendLocation Request send location
-     *
      * @return send Message is returned
      */
     public Message sendLocation(RequestSendLocation requestSendLocation) throws IOException {
@@ -664,7 +683,6 @@ public class Bot implements BotInterface {
      * Use this method to send information about a venue. On success, the sent Message is returned.
      *
      * @param requestSendVenue Request send venue
-     *
      * @return send Message is returned
      */
     public Message sendVenue(RequestSendVenue requestSendVenue) throws IOException {
@@ -713,7 +731,6 @@ public class Bot implements BotInterface {
      * Use this method to send phone contacts. On success, the sent Message is returned.
      *
      * @param requestSendContact Request send contact
-     *
      * @return send Message is returned
      */
     public Message sendContact(RequestSendContact requestSendContact) throws IOException {
@@ -765,7 +782,6 @@ public class Bot implements BotInterface {
      * We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
      *
      * @param requestSendChatAction Request send chat action
-     *
      * @return boolean
      */
     public boolean sendChatAction(RequestSendChatAction requestSendChatAction) throws IOException {
@@ -797,9 +813,7 @@ public class Bot implements BotInterface {
      * Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
      *
      * @param requestGetUserProfilePhotos Request get user profile photos
-     *
      * @return Returns a UserProfilePhotos object.
-     *
      * @throws IOException
      */
     public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
@@ -842,9 +856,7 @@ public class Bot implements BotInterface {
      * saved when the File object is received.
      *
      * @param requestGetFile Request get file
-     *
      * @return On success, a File object is returned.
-     *
      * @throws IOException
      */
     public File getFile(RequestGetFile requestGetFile) throws IOException {
@@ -868,7 +880,6 @@ public class Bot implements BotInterface {
      * for get link of file you can use {@link #getFile(RequestGetFile) getFile} method.
      *
      * @param requestDownloadFile Request Download file
-     *
      * @throws IOException
      */
     public void downloadFile(RequestDownloadFile requestDownloadFile) throws IOException {
@@ -930,9 +941,7 @@ public class Bot implements BotInterface {
      * Otherwise members may only be removed by the group's creator or by the member that added them.
      *
      * @param requestKickChatMember Request kick chat member
-     *
      * @return True on success
-     *
      * @throws IOException
      */
     public boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException {
@@ -964,9 +973,7 @@ public class Bot implements BotInterface {
      * Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
      *
      * @param requestLeaveChat Request leave chat
-     *
      * @return Returns True on success.
-     *
      * @throws IOException
      */
     public boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException {
@@ -994,9 +1001,7 @@ public class Bot implements BotInterface {
      * The bot must be an administrator in the group for this to work. Returns True on success.
      *
      * @param requestUnbanChatMember Request unban chat member
-     *
      * @return Returns True on success.
-     *
      * @throws IOException
      */
     public boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException {
@@ -1029,7 +1034,6 @@ public class Bot implements BotInterface {
      * current username of a user, group or channel, etc.). Returns a Chat object on success.
      *
      * @param requestGetChat Request get chat
-     *
      * @return Returns a Chat object on success.
      */
     public Chat getChat(RequestGetChat requestGetChat) throws IOException {
@@ -1057,9 +1061,7 @@ public class Bot implements BotInterface {
      * If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
      *
      * @param requestGetChatAdministrators Request get chat administrators
-     *
      * @return returns an Array of ChatMember objects
-     *
      * @throws IOException
      */
     public List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException {
@@ -1093,9 +1095,7 @@ public class Bot implements BotInterface {
      * Use this method to get the number of members in a chat. Returns Int on success.
      *
      * @param requestGetChatMembersCount Request get chat members count
-     *
      * @return Returns Int on success.
-     *
      * @throws IOException
      */
     public int getChatMembersCount(RequestGetChatMembersCount requestGetChatMembersCount) throws IOException {
@@ -1123,9 +1123,7 @@ public class Bot implements BotInterface {
      * Use this method to get information about a member of a chat. Returns a ChatMember object on success.
      *
      * @param requestGetChatMember Request get chat member
-     *
      * @return Returns a ChatMember object on success.
-     *
      * @throws IOException
      */
     public ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException {
@@ -1160,9 +1158,7 @@ public class Bot implements BotInterface {
      * to the user as a notification at the top of the chat screen or as an alert. On success, True is returned.
      *
      * @param requestAnswerCallbackQuery Request answer callback query
-     *
      * @return On success, True is returned.
-     *
      * @throws IOException
      */
     public boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException {
@@ -1190,18 +1186,6 @@ public class Bot implements BotInterface {
         }
     }
 
-    public void setWebHook(RequestSetWebHook requestSetWebHook) {
-        //TODO: add input file for certificate file;
-        String setWebHookUrl = API_URL + token + "/setWebhook?url=" + requestSetWebHook.getUrl() +
-                "&certificate=" + "";
-
-        SSLConnection sslConnection = new SSLConnection(setWebHookUrl);
-        try {
-            JSONObject jsonObject = sslConnection.getSSLConnection();
-        } catch (Exception e) {
-            throw new SendChatActionException(e.getMessage());
-        }
-    }
     //endregion
 
     //region Getter and Setter

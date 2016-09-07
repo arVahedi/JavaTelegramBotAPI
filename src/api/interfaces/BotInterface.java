@@ -15,6 +15,8 @@ public interface BotInterface {
 
     List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException;
 
+    boolean setWebHook(RequestSetWebHook requestSetWebHook) throws IOException;
+
     Message sendMessage(RequestSendMessage requestSendMessage) throws IOException;
 
     Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException;

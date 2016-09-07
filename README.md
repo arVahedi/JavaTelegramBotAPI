@@ -7,7 +7,8 @@ For report bugs and suggestion feature add [issue](https://github.com/arVahedi/J
 
 ## Usage :
 ### Initialize Bot:
-`Bot.setToken(your_token);`
+`Bot.initialize(your_token);`
 
-Bot is a singleton class and u should initialize your bot only once. 
+Bot is a singleton class and u should initialize your bot only once.
+
 
