@@ -2,6 +2,7 @@ package api.interfaces;
 
 import api.entity.*;
 import api.requestobject.*;
+import api.requestobject.updatingrequest.RequestEditMessageText;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,5 +63,7 @@ public interface BotInterface {
     ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException;
 
     boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException;
+
+    boolean editMessageText(RequestEditMessageText requestEditMessageText) throws IOException;
 
 }

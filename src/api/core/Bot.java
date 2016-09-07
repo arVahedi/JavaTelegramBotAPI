@@ -3,11 +3,13 @@ package api.core;
 import api.entity.*;
 import api.enums.ChatMemberStatusEnum;
 import api.exception.*;
+import api.exception.updatingexception.EditMessageTextException;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
 import api.net.MultipartFormData;
 import api.net.SSLConnection;
 import api.requestobject.*;
+import api.requestobject.updatingrequest.RequestEditMessageText;
 import api.utilities.JsonUtil;
 import com.google.gson.Gson;
 
@@ -57,6 +59,7 @@ public class Bot implements BotInterface {
     }
 
     //region Bot action
+    //region Base Methods
 
     /**
      * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
@@ -1185,6 +1188,57 @@ public class Bot implements BotInterface {
             throw new AnswerCallbackQueryException("Illegal Response.");
         }
     }
+    //endregion
+
+    /**
+     * Use this method to edit text messages sent by the bot or via the bot (for inline bots). On success,
+     * if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
+     * @param requestEditMessageText Request edit message text
+     * @return On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     * @throws IOException
+     */
+    //region Updating Methods
+    public boolean editMessageText(RequestEditMessageText requestEditMessageText) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/editMessageText?");
+
+        if (requestEditMessageText.getText() != null) {
+            urlBuilder.append("text=").append(URLEncoder.encode(requestEditMessageText.getText(), "UTF-8"));
+        } else {
+            throw new EditMessageTextException("Text field is null.");
+        }
+
+        if (requestEditMessageText.getParseMode() != null) {
+            urlBuilder.append("&parse_mode=").append(requestEditMessageText.getParseMode().value());
+        }
+
+        urlBuilder.append("&disable_web_page_preview=").append(requestEditMessageText.isDisableWebPagePreview());
+
+        if (requestEditMessageText.getReplyMarkup() != null) {
+            urlBuilder.append("&reply_markup=").append(JsonUtil.toJsonSerializable(requestEditMessageText.getReplyMarkup()));
+        }
+
+        if (requestEditMessageText.getInlineMessageId() != null) {
+            urlBuilder.append("&inline_message_id=").append(requestEditMessageText.getInlineMessageId());
+        } else if (requestEditMessageText.getChat() != null && requestEditMessageText.getChat().isValid()
+                && requestEditMessageText.getMessage() != null) {
+            urlBuilder.append("&chat_id=").append(requestEditMessageText.getChat().getChatId());
+            urlBuilder.append("&message_id=").append(requestEditMessageText.getMessage().getMessageId());
+        } else {
+            throw new EditMessageTextException("Chat id and inline message id are null.");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            // This can be Message entity.
+            return true;
+        } else {
+            throw new EditMessageTextException("Illegal Response. - " + jsonResponse.get("error_code") + " : " + jsonResponse.get("description"));
+        }
+    }
+    //endregion
 
     //endregion
 
