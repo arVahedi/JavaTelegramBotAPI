@@ -37,10 +37,10 @@ public class Main {
 
 
         // Get updates
-        /*List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
+        List<Message> messageList = Bot.getInstance().getUpdates(new RequestGetUpdate());
         messageList.forEach((message -> {
             System.out.println(message.getChat().getChatId() + " --- " + message.getFrom().getId());
-        }));*/
+        }));
 
         // Send Message
         /*RequestSendMessage requestSendMessage = new RequestSendMessage(new Chat(74619619), "Amnafzar Co.");

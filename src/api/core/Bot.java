@@ -52,10 +52,59 @@ public class Bot implements BotInterface {
         return instance;
     }
 
-    //region Bot action
-
     public static void initialize(String token) {
         Bot.token = token;
+    }
+
+    //region Bot action
+
+    /**
+     * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
+     * Notes :
+     * 1. This method will not work if an outgoing webhook is set up.
+     * 2. In order to avoid getting duplicate updates, recalculate offset after each server response.
+     *
+     * @param requestGetUpdate Request get update
+     * @return An Array of Update objects is returned.
+     * @throws IOException
+     */
+    public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
+        String updateUrl = API_URL + token + "/getUpdates?";
+
+        if (requestGetUpdate.getOffset() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl += "&";
+            }
+            updateUrl = updateUrl + "offset=" + requestGetUpdate.getOffset();
+        }
+        if (requestGetUpdate.getLimit() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl += "&";
+            }
+            updateUrl = updateUrl + "limit=" + requestGetUpdate.getLimit();
+        }
+        if (requestGetUpdate.getTimeout() != 0) {
+            if (!(updateUrl.endsWith("?"))) {
+                updateUrl += "&";
+            }
+            updateUrl = updateUrl + "timeout=" + requestGetUpdate.getTimeout();
+        }
+
+        SSLConnection sslConnection = new SSLConnection(updateUrl);
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        List<Message> listOfAllMessage = new ArrayList<Message>();
+        if ((boolean) jsonResponse.get("ok")) {
+            jsonResponse.getJSONArray("result").forEach((key) -> {
+                Message message = (Message) JsonUtil.fromJsonSerializable(((JSONObject) key).get("message").toString(), Message.class);
+                message.setUpdateId((Integer) ((JSONObject) key).get("update_id"));
+                listOfAllMessage.add(message);
+            });
+        } else {
+            throw new GetUpdateException("Illegal Response.");
+        }
+
+        return listOfAllMessage;
     }
 
     /**
@@ -1139,46 +1188,6 @@ public class Bot implements BotInterface {
         } else {
             throw new AnswerCallbackQueryException("Illegal Response.");
         }
-    }
-
-    public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
-        String updateUrl = API_URL + token + "/getUpdates?";
-
-        if (requestGetUpdate.getOffset() != 0) {
-            if (!(updateUrl.endsWith("?"))) {
-                updateUrl = updateUrl + "&";
-            }
-            updateUrl = updateUrl + "offset=" + requestGetUpdate.getOffset();
-        }
-        if (requestGetUpdate.getLimit() != 0) {
-            if (!(updateUrl.endsWith("?"))) {
-                updateUrl = updateUrl + "&";
-            }
-            updateUrl = updateUrl + "limit=" + requestGetUpdate.getLimit();
-        }
-        if (requestGetUpdate.getTimeout() != 0) {
-            if (!(updateUrl.endsWith("?"))) {
-                updateUrl = updateUrl + "&";
-            }
-            updateUrl = updateUrl + "timeout=" + requestGetUpdate.getTimeout();
-        }
-
-        SSLConnection sslConnection = new SSLConnection(updateUrl);
-        JSONObject jsonResponse = sslConnection.getSSLConnection();
-
-        List<Message> listOfAllMessage = new ArrayList<Message>();
-        if ((boolean) jsonResponse.get("ok")) {
-
-            jsonResponse.getJSONArray("result").forEach((key) -> {
-                Message message = (Message) JsonUtil.fromJsonSerializable(((JSONObject) key).get("message").toString(), Message.class);
-                message.setUpdateId((Integer) ((JSONObject) key).get("update_id"));
-                listOfAllMessage.add(message);
-            });
-        } else {
-            throw new GetUpdateException();
-        }
-
-        return listOfAllMessage;
     }
 
     public void setWebHook(RequestSetWebHook requestSetWebHook) {

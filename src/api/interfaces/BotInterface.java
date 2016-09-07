@@ -13,6 +13,8 @@ public interface BotInterface {
 
     User getMe() throws IOException;
 
+    List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException;
+
     Message sendMessage(RequestSendMessage requestSendMessage) throws IOException;
 
     Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException;
