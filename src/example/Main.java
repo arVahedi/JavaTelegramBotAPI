@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        Bot.setToken("116099220:AAG2g_GfyUSLBdO9b8vT48TnNPnQl6z6DOg");
+        Bot.initialize("116099220:AAG2g_GfyUSLBdO9b8vT48TnNPnQl6z6DOg");
         Chat chat = new Chat(74619619);
 
         // Make replyKeyboard

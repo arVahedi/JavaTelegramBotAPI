@@ -54,6 +54,10 @@ public class Bot implements BotInterface {
 
     //region Bot action
 
+    public static void initialize(String token) {
+        Bot.token = token;
+    }
+
     /**
      * A simple method for testing your bot's auth token.
      * Requires no parameters. Returns basic information about the bot in form of a User object.
@@ -1212,7 +1216,8 @@ public class Bot implements BotInterface {
         return Bot.token;
     }
 
-    public static void setToken(String token) {
+    // Don't set Token directly. Use initialize method instead.
+    private static void setToken(String token) {
         Bot.token = token;
     }
     //endregion
