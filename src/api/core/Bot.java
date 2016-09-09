@@ -4,6 +4,7 @@ import api.entity.*;
 import api.enums.ChatMemberStatusEnum;
 import api.exception.*;
 import api.exception.updatingexception.EditMessageCaptionException;
+import api.exception.updatingexception.EditMessageReplyMarkupException;
 import api.exception.updatingexception.EditMessageTextException;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
@@ -11,6 +12,7 @@ import api.net.MultipartFormData;
 import api.net.SSLConnection;
 import api.requestobject.*;
 import api.requestobject.updatingrequest.RequestEditMessageCaption;
+import api.requestobject.updatingrequest.RequestEditMessageReplyMarkup;
 import api.requestobject.updatingrequest.RequestEditMessageText;
 import api.utilities.JsonUtil;
 import com.google.gson.Gson;
@@ -1339,9 +1341,49 @@ public class Bot implements BotInterface {
         }
     }
 
-    /*public Object editMessageReplyMarkup(){
+    /**
+     * Use this method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots).
+     * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
+     * @param requestEditMessageReplyMarkup Request edit reply markup
+     *
+     * @return On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
+     * @throws IOException
+     */
+    public Object editMessageReplyMarkup(RequestEditMessageReplyMarkup requestEditMessageReplyMarkup) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/editMessageReplyMarkup?");
 
-    }*/
+        if (requestEditMessageReplyMarkup.getReplyMarkup() != null) {
+            urlBuilder.append("reply_markup=").append(JsonUtil.toJsonSerializable(requestEditMessageReplyMarkup.getReplyMarkup()));
+        } else {
+            throw new EditMessageReplyMarkupException("Reply markup is null.");
+        }
+
+        if (requestEditMessageReplyMarkup.getInlineMessageId() != null) {
+            urlBuilder.append("&inline_message_id=").append(requestEditMessageReplyMarkup.getInlineMessageId());
+        } else if (requestEditMessageReplyMarkup.getChat() != null && requestEditMessageReplyMarkup.getChat().isValid()
+                && requestEditMessageReplyMarkup.getMessage() != null) {
+            urlBuilder.append("&chat_id=").append(requestEditMessageReplyMarkup.getChat().getChatId());
+            urlBuilder.append("&message_id=").append(requestEditMessageReplyMarkup.getMessage().getMessageId());
+        } else {
+            throw new EditMessageReplyMarkupException("Chat id and inline message id are null.");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            if (jsonResponse.get("result").toString().equalsIgnoreCase("true")) {    // Support inline bots
+                return true;
+            } else {
+                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            }
+        } else {
+            throw new EditMessageReplyMarkupException("Illegal Response. - " + jsonResponse.get("error_code") + " : " + jsonResponse.get("description"));
+        }
+
+    }
     //endregion
 
     //endregion
