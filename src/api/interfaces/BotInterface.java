@@ -2,6 +2,7 @@ package api.interfaces;
 
 import api.entity.*;
 import api.requestobject.*;
+import api.requestobject.updatingrequest.RequestEditMessageCaption;
 import api.requestobject.updatingrequest.RequestEditMessageText;
 
 import java.io.IOException;
@@ -64,6 +65,7 @@ public interface BotInterface {
 
     boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException;
 
-    boolean editMessageText(RequestEditMessageText requestEditMessageText) throws IOException;
+    Object editMessageText(RequestEditMessageText requestEditMessageText) throws IOException;
 
+    Object editMessageCaption(RequestEditMessageCaption requestEditMessageCaption) throws IOException;
 }

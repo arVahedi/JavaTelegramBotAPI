@@ -3,12 +3,14 @@ package api.core;
 import api.entity.*;
 import api.enums.ChatMemberStatusEnum;
 import api.exception.*;
+import api.exception.updatingexception.EditMessageCaptionException;
 import api.exception.updatingexception.EditMessageTextException;
 import api.interfaces.BotInterface;
 import api.json.JSONObject;
 import api.net.MultipartFormData;
 import api.net.SSLConnection;
 import api.requestobject.*;
+import api.requestobject.updatingrequest.RequestEditMessageCaption;
 import api.requestobject.updatingrequest.RequestEditMessageText;
 import api.utilities.JsonUtil;
 import com.google.gson.Gson;
@@ -68,7 +70,9 @@ public class Bot implements BotInterface {
      * 2. In order to avoid getting duplicate updates, recalculate offset after each server response.
      *
      * @param requestGetUpdate Request get update
+     *
      * @return An Array of Update objects is returned.
+     *
      * @throws IOException
      */
     public List<Message> getUpdates(RequestGetUpdate requestGetUpdate) throws IOException {
@@ -124,7 +128,9 @@ public class Bot implements BotInterface {
      * 3. Ports currently supported for Webhooks: 443, 80, 88, 8443.
      *
      * @param requestSetWebHook Request set webhook
+     *
      * @return
+     *
      * @throws IOException
      */
     public boolean setWebHook(RequestSetWebHook requestSetWebHook) throws IOException {
@@ -152,6 +158,7 @@ public class Bot implements BotInterface {
      * Requires no parameters. Returns basic information about the bot in form of a User object.
      *
      * @return {@link api.entity.User User} - Basic information about the bot
+     *
      * @throws IOException
      */
     public User getMe() throws IOException {
@@ -171,7 +178,9 @@ public class Bot implements BotInterface {
      * Use this method to send text messages. On success, the sent Message is returned.
      *
      * @param requestSendMessage request send message
+     *
      * @return Message - The send message is returned.
+     *
      * @throws IOException
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
@@ -216,7 +225,9 @@ public class Bot implements BotInterface {
      * Use this method to forward messages of any kind. On success, the sent Message is returned.
      *
      * @param requestForwardMessage Request forward message
+     *
      * @return send Message is returned.
+     *
      * @throws IOException
      */
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
@@ -250,7 +261,9 @@ public class Bot implements BotInterface {
      * Use this method to send photos. On success, the sent Message is returned.
      *
      * @param requestSendPhoto Request send photo
+     *
      * @return send Message is returned.
+     *
      * @throws IOException
      */
     public Message sendPhoto(RequestSendPhoto requestSendPhoto) throws IOException {
@@ -313,7 +326,9 @@ public class Bot implements BotInterface {
      * Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendAudio Request send audio
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendAudio(RequestSendAudio requestSendAudio) throws IOException {
@@ -383,7 +398,9 @@ public class Bot implements BotInterface {
      * Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      *
      * @param requestSendDocument Request send document
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendDocument(RequestSendDocument requestSendDocument) throws IOException {
@@ -444,7 +461,9 @@ public class Bot implements BotInterface {
      * Use this method to send .webp stickers. On success, the sent Message is returned.
      *
      * @param requestSendSticker Request send sticker
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendSticker(RequestSendSticker requestSendSticker) throws IOException {
@@ -503,7 +522,9 @@ public class Bot implements BotInterface {
      * this limit may be changed in the future.
      *
      * @param requestSendVideo Request send video
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendVideo(RequestSendVideo requestSendVideo) throws IOException {
@@ -581,7 +602,9 @@ public class Bot implements BotInterface {
      * this limit may be changed in the future.
      *
      * @param requestSendVoice Request send voice
+     *
      * @return send Message is returned
+     *
      * @throws IOException
      */
     public Message sendVoice(RequestSendVoice requestSendVoice) throws IOException {
@@ -644,6 +667,7 @@ public class Bot implements BotInterface {
      * Use this method to send point on the map. On success, the sent Message is returned.
      *
      * @param requestSendLocation Request send location
+     *
      * @return send Message is returned
      */
     public Message sendLocation(RequestSendLocation requestSendLocation) throws IOException {
@@ -686,6 +710,7 @@ public class Bot implements BotInterface {
      * Use this method to send information about a venue. On success, the sent Message is returned.
      *
      * @param requestSendVenue Request send venue
+     *
      * @return send Message is returned
      */
     public Message sendVenue(RequestSendVenue requestSendVenue) throws IOException {
@@ -734,6 +759,7 @@ public class Bot implements BotInterface {
      * Use this method to send phone contacts. On success, the sent Message is returned.
      *
      * @param requestSendContact Request send contact
+     *
      * @return send Message is returned
      */
     public Message sendContact(RequestSendContact requestSendContact) throws IOException {
@@ -785,6 +811,7 @@ public class Bot implements BotInterface {
      * We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
      *
      * @param requestSendChatAction Request send chat action
+     *
      * @return boolean
      */
     public boolean sendChatAction(RequestSendChatAction requestSendChatAction) throws IOException {
@@ -816,7 +843,9 @@ public class Bot implements BotInterface {
      * Use this method to get a list of profile pictures for a user. Returns a UserProfilePhotos object.
      *
      * @param requestGetUserProfilePhotos Request get user profile photos
+     *
      * @return Returns a UserProfilePhotos object.
+     *
      * @throws IOException
      */
     public UserProfilePhoto getUserProfilePhotos(RequestGetUserProfilePhotos requestGetUserProfilePhotos) throws IOException {
@@ -859,7 +888,9 @@ public class Bot implements BotInterface {
      * saved when the File object is received.
      *
      * @param requestGetFile Request get file
+     *
      * @return On success, a File object is returned.
+     *
      * @throws IOException
      */
     public File getFile(RequestGetFile requestGetFile) throws IOException {
@@ -883,6 +914,7 @@ public class Bot implements BotInterface {
      * for get link of file you can use {@link #getFile(RequestGetFile) getFile} method.
      *
      * @param requestDownloadFile Request Download file
+     *
      * @throws IOException
      */
     public void downloadFile(RequestDownloadFile requestDownloadFile) throws IOException {
@@ -944,7 +976,9 @@ public class Bot implements BotInterface {
      * Otherwise members may only be removed by the group's creator or by the member that added them.
      *
      * @param requestKickChatMember Request kick chat member
+     *
      * @return True on success
+     *
      * @throws IOException
      */
     public boolean kickChatMember(RequestKickChatMember requestKickChatMember) throws IOException {
@@ -976,7 +1010,9 @@ public class Bot implements BotInterface {
      * Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
      *
      * @param requestLeaveChat Request leave chat
+     *
      * @return Returns True on success.
+     *
      * @throws IOException
      */
     public boolean leaveChat(RequestLeaveChat requestLeaveChat) throws IOException {
@@ -1004,7 +1040,9 @@ public class Bot implements BotInterface {
      * The bot must be an administrator in the group for this to work. Returns True on success.
      *
      * @param requestUnbanChatMember Request unban chat member
+     *
      * @return Returns True on success.
+     *
      * @throws IOException
      */
     public boolean unbanChatMember(RequestUnbanChatMember requestUnbanChatMember) throws IOException {
@@ -1037,6 +1075,7 @@ public class Bot implements BotInterface {
      * current username of a user, group or channel, etc.). Returns a Chat object on success.
      *
      * @param requestGetChat Request get chat
+     *
      * @return Returns a Chat object on success.
      */
     public Chat getChat(RequestGetChat requestGetChat) throws IOException {
@@ -1064,7 +1103,9 @@ public class Bot implements BotInterface {
      * If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
      *
      * @param requestGetChatAdministrators Request get chat administrators
+     *
      * @return returns an Array of ChatMember objects
+     *
      * @throws IOException
      */
     public List<ChatMember> getChatAdministrators(RequestGetChatAdministrators requestGetChatAdministrators) throws IOException {
@@ -1098,7 +1139,9 @@ public class Bot implements BotInterface {
      * Use this method to get the number of members in a chat. Returns Int on success.
      *
      * @param requestGetChatMembersCount Request get chat members count
+     *
      * @return Returns Int on success.
+     *
      * @throws IOException
      */
     public int getChatMembersCount(RequestGetChatMembersCount requestGetChatMembersCount) throws IOException {
@@ -1126,7 +1169,9 @@ public class Bot implements BotInterface {
      * Use this method to get information about a member of a chat. Returns a ChatMember object on success.
      *
      * @param requestGetChatMember Request get chat member
+     *
      * @return Returns a ChatMember object on success.
+     *
      * @throws IOException
      */
     public ChatMember getChatMember(RequestGetChatMember requestGetChatMember) throws IOException {
@@ -1161,7 +1206,9 @@ public class Bot implements BotInterface {
      * to the user as a notification at the top of the chat screen or as an alert. On success, True is returned.
      *
      * @param requestAnswerCallbackQuery Request answer callback query
+     *
      * @return On success, True is returned.
+     *
      * @throws IOException
      */
     public boolean answerCallbackQuery(RequestAnswerCallbackQuery requestAnswerCallbackQuery) throws IOException {
@@ -1190,16 +1237,19 @@ public class Bot implements BotInterface {
     }
     //endregion
 
+    //region Updating Methods
+
     /**
      * Use this method to edit text messages sent by the bot or via the bot (for inline bots). On success,
      * if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
      *
      * @param requestEditMessageText Request edit message text
+     *
      * @return On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
      * @throws IOException
      */
-    //region Updating Methods
-    public boolean editMessageText(RequestEditMessageText requestEditMessageText) throws IOException {
+    public Object editMessageText(RequestEditMessageText requestEditMessageText) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/editMessageText?");
 
         if (requestEditMessageText.getText() != null) {
@@ -1232,12 +1282,66 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            // This can be Message entity.
-            return true;
+            if (jsonResponse.get("result").toString().equalsIgnoreCase("true")) {    // Support inline bots
+                return true;
+            } else {
+                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            }
         } else {
             throw new EditMessageTextException("Illegal Response. - " + jsonResponse.get("error_code") + " : " + jsonResponse.get("description"));
         }
     }
+
+    /**
+     * Use this method to edit captions of messages sent by the bot or via the bot (for inline bots).
+     * On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
+     * @param requestEditMessageCaption Request edit message caption
+     *
+     * @return On success, if edited message is sent by the bot, the edited Message is returned, otherwise True is returned.
+     *
+     * @throws IOException
+     */
+    public Object editMessageCaption(RequestEditMessageCaption requestEditMessageCaption) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/editMessageCaption?");
+
+        if (requestEditMessageCaption.getCaption() != null) {
+            urlBuilder.append("caption=").append(requestEditMessageCaption.getCaption());
+        } else {
+            throw new EditMessageCaptionException("Caption is null.");
+        }
+
+        if (requestEditMessageCaption.getReplyMarkup() != null) {
+            urlBuilder.append("&reply_markup=").append(JsonUtil.toJsonSerializable(requestEditMessageCaption.getReplyMarkup()));
+        }
+
+        if (requestEditMessageCaption.getInlineMessageId() != null) {
+            urlBuilder.append("&inline_message_id=").append(requestEditMessageCaption.getInlineMessageId());
+        } else if (requestEditMessageCaption.getChat() != null && requestEditMessageCaption.getChat().isValid()
+                && requestEditMessageCaption.getMessage() != null) {
+            urlBuilder.append("&chat_id=").append(requestEditMessageCaption.getChat().getChatId());
+            urlBuilder.append("&message_id=").append(requestEditMessageCaption.getMessage().getMessageId());
+        } else {
+            throw new EditMessageCaptionException("Chat id and inline message id are null.");
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            if (jsonResponse.get("result").toString().equalsIgnoreCase("true")) {    // Support inline bots
+                return true;
+            } else {
+                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            }
+        } else {
+            throw new EditMessageCaptionException("Illegal Response. - " + jsonResponse.get("error_code") + " : " + jsonResponse.get("description"));
+        }
+    }
+
+    /*public Object editMessageReplyMarkup(){
+
+    }*/
     //endregion
 
     //endregion
