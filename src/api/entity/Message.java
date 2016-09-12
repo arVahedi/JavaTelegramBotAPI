@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Message implements Serializable {
-    private long message_id;
+    private int message_id;
     private User from;
     private int date;
     private Chat chat;
@@ -40,11 +40,11 @@ public class Message implements Serializable {
 
     private int updateId;
 
-    public long getMessageId() {
+    public int getMessageId() {
         return message_id;
     }
 
-    public void setMessageId(long messageId) {
+    public void setMessageId(int messageId) {
         this.message_id = messageId;
     }
 
