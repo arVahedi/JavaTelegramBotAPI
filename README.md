@@ -7,7 +7,9 @@ For report bugs and suggestion feature add [issue](https://github.com/arVahedi/J
 
 ## Usage :
 ### Initialize Bot:
-```Bot.initialize(your_token);```
+```
+Bot.initialize(your_token);
+```
 
 Bot is a singleton class and you should initialize your bot only once.
 
@@ -139,13 +141,19 @@ userProfilePhoto.getPhotos().forEach((item) -> {
 ```
 
 ### Get chat
-```Chat chat1 = Bot.getInstance().getChat(new RequestGetChat(chat));```
+```
+Chat chat1 = Bot.getInstance().getChat(new RequestGetChat(chat));
+```
 
 ### Get Chat Administrators
-```Bot.getInstance().getChatAdministrators(new RequestGetChatAdministrators(new Chat(-169011245)));```
+```
+Bot.getInstance().getChatAdministrators(new RequestGetChatAdministrators(new Chat(-169011245)));
+```
 
 ### Get chat members count
-```int count = Bot.getInstance().getChatMembersCount(new RequestGetChatMembersCount(new Chat(-169011245)));```
+```
+int count = Bot.getInstance().getChatMembersCount(new RequestGetChatMembersCount(new Chat(-169011245)));
+```
 
 ### Get chat member
 ```
