@@ -9,6 +9,6 @@ For report bugs and suggestion feature add [issue](https://github.com/arVahedi/J
 ### Initialize Bot:
 `Bot.initialize(your_token);`
 
-Bot is a singleton class and u should initialize your bot only once.
+Bot is a singleton class and you should initialize your bot only once.
 
 
