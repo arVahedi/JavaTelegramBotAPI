@@ -1237,6 +1237,56 @@ public class Bot implements BotInterface {
             throw new AnswerCallbackQueryException("Illegal Response.");
         }
     }
+
+    /**
+     * Use this method to send answers to an inline query. On success, True is returned.
+     * No more than 50 results per query are allowed.
+     *
+     * @param requestAnswerInlineQuery Request answer inline query
+     *
+     * @return On success, True is returned.
+     *
+     * @throws IOException
+     */
+    public boolean answerInlineQuery(RequestAnswerInlineQuery requestAnswerInlineQuery) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + token + "/answerInlineQuery?");
+
+        if (requestAnswerInlineQuery.getInline_query_id() == null || requestAnswerInlineQuery.getResults().isEmpty()) {
+            throw new AnswerInlineQueryException("inline query id or results is required");
+        }
+
+        urlBuilder.append("inline_query_id=").append(requestAnswerInlineQuery.getInline_query_id());
+        urlBuilder.append("&results=").append(new Gson().toJson(requestAnswerInlineQuery.getResults()));
+
+        if (requestAnswerInlineQuery.getCache_time() > 0) {
+            urlBuilder.append("&cache_time=").append(requestAnswerInlineQuery.getCache_time());
+        }
+
+        if (requestAnswerInlineQuery.is_personal()) {
+            urlBuilder.append("&is_personal=").append("True");
+        }
+
+        if (requestAnswerInlineQuery.getNext_offset() != null) {
+            urlBuilder.append("&is_personal=").append(requestAnswerInlineQuery.getNext_offset());
+        }
+
+        if (requestAnswerInlineQuery.getSwitch_pm_text() != null) {
+            urlBuilder.append("&switch_pm_text=").append(requestAnswerInlineQuery.getSwitch_pm_text());
+        }
+
+        if (requestAnswerInlineQuery.getSwitch_pm_parameter() != null) {
+            urlBuilder.append("&switch_pm_parameter=").append(requestAnswerInlineQuery.getSwitch_pm_parameter());
+        }
+
+        SSLConnection sslConnection = new SSLConnection(urlBuilder.toString());
+        JSONObject jsonResponse = sslConnection.getSSLConnection();
+
+        if ((boolean) jsonResponse.get("ok")) {
+            return true;
+        } else {
+            throw new AnswerInlineQueryException("Illegal Response.");
+        }
+    }
     //endregion
 
     //region Updating Methods
