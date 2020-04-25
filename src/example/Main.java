@@ -1,13 +1,9 @@
 package example;
 
-import api.core.Bot;
-import api.entity.Chat;
-import api.entity.KeyboardButton;
-import api.entity.Message;
-import api.entity.ReplyKeyboardMarkup;
-import api.requestobject.RequestGetUpdate;
-import api.requestobject.RequestSendMessage;
-import api.requestobject.updatingrequest.RequestEditMessageText;
+import telegram.bot.api.core.Bot;
+import telegram.bot.api.entity.Chat;
+import telegram.bot.api.entity.KeyboardButton;
+import telegram.bot.api.entity.ReplyKeyboardMarkup;
 
 import java.io.IOException;
 import java.util.ArrayList;
