@@ -110,7 +110,7 @@ public class Bot implements BotInterface {
                 listOfAllMessage.add(message);
             });
         } else {
-            throw new GetUpdateException("Illegal Response.");
+            new GetUpdateException("Illegal Response.");
         }
 
         return listOfAllMessage;
