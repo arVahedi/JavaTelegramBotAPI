@@ -7,6 +7,7 @@ public class User implements Serializable {
     private String username;
     private String first_name;
     private String last_name;
+    private boolean is_bot;
 
     public User(){}
 
@@ -44,5 +45,13 @@ public class User implements Serializable {
 
     public void setFirst_name(String first_name) {
         this.first_name = first_name;
+    }
+
+    public boolean isBot() {
+        return is_bot;
+    }
+
+    public void setIsBot(boolean is_bot) {
+        this.is_bot = is_bot;
     }
 }

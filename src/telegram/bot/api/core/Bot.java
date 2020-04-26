@@ -1,5 +1,6 @@
 package telegram.bot.api.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import telegram.bot.api.entity.*;
 import telegram.bot.api.enums.ChatMemberStatusEnum;
 import telegram.bot.api.exception.*;
@@ -15,7 +16,6 @@ import telegram.bot.api.requestobject.updatingrequest.RequestEditMessageCaption;
 import telegram.bot.api.requestobject.updatingrequest.RequestEditMessageReplyMarkup;
 import telegram.bot.api.requestobject.updatingrequest.RequestEditMessageText;
 import telegram.bot.api.utilities.JsonUtil;
-import com.google.gson.Gson;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,8 +40,8 @@ public class Bot implements BotInterface {
 
     private static Bot instance = null;
 
-    private final static String API_URL = "https://telegram.bot.api.telegram.org/bot";
-    private final static String API_DOWNLOAD_FILE_URL = "https://telegram.bot.api.telegram.org/file/bot";
+    private final static String API_URL = "https://api.telegram.org/bot";
+    private final static String API_DOWNLOAD_FILE_URL = "https://api.telegram.org/file/bot";
     //endregion
 
     //region Constructors
@@ -169,8 +169,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            Gson gson = new Gson();
-            return gson.fromJson(jsonResponse.get("result").toString(), User.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), User.class);
         } else {
             throw new GetMeException("Illegal response.");
         }
@@ -1256,7 +1255,7 @@ public class Bot implements BotInterface {
         }
 
         urlBuilder.append("inline_query_id=").append(requestAnswerInlineQuery.getInline_query_id());
-        urlBuilder.append("&results=").append(new Gson().toJson(requestAnswerInlineQuery.getResults()));
+        urlBuilder.append("&results=").append(new ObjectMapper().writeValueAsString(requestAnswerInlineQuery.getResults()));
 
         if (requestAnswerInlineQuery.getCache_time() > 0) {
             urlBuilder.append("&cache_time=").append(requestAnswerInlineQuery.getCache_time());
