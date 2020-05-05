@@ -1,13 +1,17 @@
 package telegram.bot.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReplyKeyboardMarkup implements Serializable {
     private List<List<KeyboardButton>> keyboard = new ArrayList<>();
-    private boolean resize_keyboard;
-    private boolean one_time_keyboard;
+    @JsonProperty("resize_keyboard")
+    private boolean resizeKeyboard;
+    @JsonProperty("one_time_keyboard")
+    private boolean oneTimeKeyboard;
     private boolean selective;
 
     public List<List<KeyboardButton>> getKeyboard() {
@@ -19,19 +23,19 @@ public class ReplyKeyboardMarkup implements Serializable {
     }
 
     public boolean isResizeKeyboard() {
-        return resize_keyboard;
+        return resizeKeyboard;
     }
 
     public void setResizeKeyboard(boolean resizeKeyboard) {
-        this.resize_keyboard = resizeKeyboard;
+        this.resizeKeyboard = resizeKeyboard;
     }
 
     public boolean isOneTimeKeyboard() {
-        return one_time_keyboard;
+        return oneTimeKeyboard;
     }
 
     public void setOneTimeKeyboard(boolean oneTimeKeyboard) {
-        this.one_time_keyboard = oneTimeKeyboard;
+        this.oneTimeKeyboard = oneTimeKeyboard;
     }
 
     public boolean isSelective() {
