@@ -105,7 +105,15 @@ public class Bot implements BotInterface {
         List<Message> listOfAllMessage = new ArrayList<Message>();
         if ((boolean) jsonResponse.get("ok")) {
             jsonResponse.getJSONArray("result").forEach((key) -> {
-                Message message = (Message) JsonUtil.fromJsonSerializable(((JSONObject) key).get("message").toString(), Message.class);
+                JSONObject jsonKey = (JSONObject) key;
+                Message message = null;
+                if (jsonKey.has("message")) {
+                     message = JsonUtil.fromJsonSerializable((jsonKey).get("message").toString(), Message.class);
+                } else if (jsonKey.has("edited_message")) {
+                    message = JsonUtil.fromJsonSerializable((jsonKey).get("edited_message").toString(), Message.class);
+                } else {
+                    return;
+                }
                 message.setUpdateId((Integer) ((JSONObject) key).get("update_id"));
                 listOfAllMessage.add(message);
             });
@@ -213,7 +221,7 @@ public class Bot implements BotInterface {
         try {
             JSONObject jsonResponse = sslConnection.getSSLConnection();
             if ((boolean) jsonResponse.get("ok")) {
-                return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
             } else {
                 throw new SendMessageException("Illegal response.");
             }
@@ -229,9 +237,8 @@ public class Bot implements BotInterface {
      *
      * @return send Message is returned.
      *
-     * @throws IOException
      */
-    public Message forwardMessage(RequestForwardMessage requestForwardMessage) throws IOException {
+    public Message forwardMessage(RequestForwardMessage requestForwardMessage) {
 
         String chatId;
         if (requestForwardMessage.getChat().isValid()) {
@@ -248,7 +255,7 @@ public class Bot implements BotInterface {
         try {
             JSONObject jsonResponse = sslConnection.getSSLConnection();
             if ((boolean) jsonResponse.get("ok")) {
-                return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
             } else {
                 throw new ForwardMessageException("Illegal Response.");
             }
@@ -315,7 +322,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendPhotoException("Illegal Response.");
         }
@@ -388,7 +395,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendAudioException("Illegal Response.");
         }
@@ -452,7 +459,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendDocumentException("Illegal Response.");
         }
@@ -511,7 +518,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendStickerException("Illegal Response.");
         }
@@ -590,7 +597,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendVideoException("Illegal Response.");
         }
@@ -658,7 +665,7 @@ public class Bot implements BotInterface {
         }
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendVoiceException("Illegal Response.");
         }
@@ -701,7 +708,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendLocationException("Illegal Response.");
         }
@@ -750,7 +757,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendVenueException("Illegal Response.");
         }
@@ -800,7 +807,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Message) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } else {
             throw new SendContactException("Illegal Response.");
         }
@@ -834,7 +841,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (boolean) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Boolean.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Boolean.class);
         } else {
             throw new SendChatActionException("Illegal Response.");
         }
@@ -869,7 +876,7 @@ public class Bot implements BotInterface {
 
         UserProfilePhoto userProfilePhoto;
         if ((boolean) jsonResponse.get("ok")) {
-            userProfilePhoto = (UserProfilePhoto) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), UserProfilePhoto.class);
+            userProfilePhoto = JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), UserProfilePhoto.class);
         } else {
             throw new GetUserProfilePhotosException("Illegal Response.");
         }
@@ -902,7 +909,7 @@ public class Bot implements BotInterface {
 
         File file;
         if ((boolean) jsonResponse.get("ok")) {
-            file = (File) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), File.class);
+            file = JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), File.class);
         } else {
             throw new GetFileException("Illegal Response.");
         }
@@ -942,8 +949,7 @@ public class Bot implements BotInterface {
             } else {
                 // extracts file name from URL
                 fileName = requestDownloadFile.getUri().substring(
-                        requestDownloadFile.getUri().lastIndexOf("/") + 1,
-                        requestDownloadFile.getUri().length()
+                        requestDownloadFile.getUri().lastIndexOf("/") + 1
                 );
             }
 
@@ -1092,7 +1098,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (Chat) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Chat.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Chat.class);
         } else {
             throw new GetChatException("Illegal Response.");
         }
@@ -1124,7 +1130,7 @@ public class Bot implements BotInterface {
         List<ChatMember> listOfAdmins = new ArrayList<>();
         if ((boolean) jsonResponse.get("ok")) {
             jsonResponse.getJSONArray("result").forEach((key) -> {
-                ChatMember member = (ChatMember) JsonUtil.fromJsonSerializable(key.toString(), ChatMember.class);
+                ChatMember member = JsonUtil.fromJsonSerializable(key.toString(), ChatMember.class);
                 member.setStatus(ChatMemberStatusEnum.valueOf(((JSONObject) key).get("status").toString().toUpperCase()));
                 listOfAdmins.add(member);
 
@@ -1158,7 +1164,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            return (int) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Integer.class);
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Integer.class);
 
         } else {
             throw new GetChatMembersCountException("Illegal Response.");
@@ -1194,7 +1200,7 @@ public class Bot implements BotInterface {
         JSONObject jsonResponse = sslConnection.getSSLConnection();
 
         if ((boolean) jsonResponse.get("ok")) {
-            ChatMember chatMember = (ChatMember) JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), ChatMember.class);
+            ChatMember chatMember = JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), ChatMember.class);
             chatMember.setStatus(ChatMemberStatusEnum.valueOf(jsonResponse.getJSONObject("result").get("status").toString().toUpperCase()));
             return chatMember;
         } else {
