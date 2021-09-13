@@ -3,6 +3,12 @@ package telegram.bot.api.requestobject;
 import telegram.bot.api.entity.*;
 import telegram.bot.api.enums.ParseModeEnum;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Gladiator on 1/23/2016 AD.
  */
@@ -24,6 +30,30 @@ public class RequestSendMessage {
     private ReplyKeyboardHide replyKeyboardHide;
     private ForceReply forceReply;
     //endregion
+
+    public List<String> getUrlEncodedSafeLengthText(int length) throws UnsupportedEncodingException {
+        int maximumValidLength = 4096;
+        List<String> urlEncodedMessageParts = new ArrayList<>();
+//        String[] messagesParts = this.text.split("(?<=\\G.{" + length + "})");
+
+        List<String> messagesParts = new ArrayList<>();
+        int index = 0;
+        while (index < this.text.length()) {
+            messagesParts.add(this.text.substring(index, index + Math.min(length, this.text.length() - index)));
+            index = index + Math.min(length, this.text.length() - index);
+        }
+
+        for (String part : messagesParts) {
+            String urlEncodedPart = URLEncoder.encode(part, StandardCharsets.UTF_8.name());
+            if (urlEncodedPart.length() > maximumValidLength) {
+                return this.getUrlEncodedSafeLengthText((length * 70) / 100);
+            } else {
+                urlEncodedMessageParts.add(urlEncodedPart);
+            }
+        }
+
+        return urlEncodedMessageParts;
+    }
 
     //region Getter and Setter
     public RequestSendMessage() {
@@ -82,7 +112,7 @@ public class RequestSendMessage {
             this.replyKeyboardHide = (ReplyKeyboardHide) replyMarkup;
         } else if (replyMarkup instanceof ForceReply) {
             this.forceReply = (ForceReply) replyMarkup;
-        } else if (replyMarkup instanceof InlineKeyboardMarkup){
+        } else if (replyMarkup instanceof InlineKeyboardMarkup) {
             this.inlineKeyboardMarkup = (InlineKeyboardMarkup) replyMarkup;
         }
     }

@@ -20,9 +20,12 @@ import telegram.bot.api.utilities.JsonUtil;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +111,7 @@ public class Bot implements BotInterface {
                 JSONObject jsonKey = (JSONObject) key;
                 Message message = null;
                 if (jsonKey.has("message")) {
-                     message = JsonUtil.fromJsonSerializable((jsonKey).get("message").toString(), Message.class);
+                    message = JsonUtil.fromJsonSerializable((jsonKey).get("message").toString(), Message.class);
                 } else if (jsonKey.has("edited_message")) {
                     message = JsonUtil.fromJsonSerializable((jsonKey).get("edited_message").toString(), Message.class);
                 } else {
@@ -193,38 +196,45 @@ public class Bot implements BotInterface {
      * @throws IOException
      */
     public Message sendMessage(RequestSendMessage requestSendMessage) throws IOException {
-        String chatId;
-        if (requestSendMessage.getChat().isValid()) {
-            chatId = requestSendMessage.getChat().getChatId();
-        } else {
-            throw new SendMessageException("Chat id or chat username is null");
-        }
-
-        String sendMessageUrl = API_URL + token + "/sendMessage?chat_id=" + chatId
-                + "&text=" + URLEncoder.encode(requestSendMessage.getText(), "UTF-8");
-
-
-        sendMessageUrl = sendMessageUrl + "&disable_web_page_preview=" + requestSendMessage.getDisableWebPagePreview();
-        sendMessageUrl = sendMessageUrl + "&disable_notification=" + requestSendMessage.isDisableNotification();
-
-        if (requestSendMessage.getParseMode() != null) {
-            sendMessageUrl = sendMessageUrl + "&parse_mode=" + requestSendMessage.getParseMode().value();
-        }
-        if (requestSendMessage.getReplyToMessageId() != 0) {
-            sendMessageUrl = sendMessageUrl + "&reply_to_message_id=" + requestSendMessage.getReplyToMessageId();
-        }
-        if (requestSendMessage.getReplyMarkup() != null) {
-            sendMessageUrl += "&reply_markup=" + JsonUtil.toJsonSerializable(requestSendMessage.getReplyMarkup());
-        }
-
-        SSLConnection sslConnection = new SSLConnection(sendMessageUrl);
         try {
-            JSONObject jsonResponse = sslConnection.getSSLConnection();
-            if ((boolean) jsonResponse.get("ok")) {
-                return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
+            String chatId;
+            if (requestSendMessage.getChat().isValid()) {
+                chatId = requestSendMessage.getChat().getChatId();
             } else {
-                throw new SendMessageException("Illegal response.");
+                throw new SendMessageException("Chat id or chat username is null");
             }
+
+            String sendMessageUrl = API_URL + token + "/sendMessage?chat_id=" + chatId;
+            sendMessageUrl = sendMessageUrl + "&disable_web_page_preview=" + requestSendMessage.getDisableWebPagePreview();
+            sendMessageUrl = sendMessageUrl + "&disable_notification=" + requestSendMessage.isDisableNotification();
+
+            if (requestSendMessage.getParseMode() != null) {
+                sendMessageUrl = sendMessageUrl + "&parse_mode=" + requestSendMessage.getParseMode().value();
+            }
+            if (requestSendMessage.getReplyToMessageId() != 0) {
+                sendMessageUrl = sendMessageUrl + "&reply_to_message_id=" + requestSendMessage.getReplyToMessageId();
+            }
+            if (requestSendMessage.getReplyMarkup() != null) {
+                sendMessageUrl += "&reply_markup=" + JsonUtil.toJsonSerializable(requestSendMessage.getReplyMarkup());
+            }
+
+            List<String> finalUrls = new ArrayList<>();
+            List<String> messagesParts = requestSendMessage.getUrlEncodedSafeLengthText(4000);
+
+            for (String part : messagesParts) {
+                finalUrls.add(sendMessageUrl + "&text=" + part);
+            }
+
+            JSONObject jsonResponse = null;
+            for (String url : finalUrls) {
+                SSLConnection sslConnection = new SSLConnection(url);
+                jsonResponse = sslConnection.getSSLConnection();
+                if (!(boolean) jsonResponse.get("ok")) {
+                    throw new SendMessageException("Illegal response.");
+                }
+            }
+
+            return JsonUtil.fromJsonSerializable(jsonResponse.get("result").toString(), Message.class);
         } catch (Exception e) {
             throw new SendMessageException(e.getMessage());
         }
@@ -236,7 +246,6 @@ public class Bot implements BotInterface {
      * @param requestForwardMessage Request forward message
      *
      * @return send Message is returned.
-     *
      */
     public Message forwardMessage(RequestForwardMessage requestForwardMessage) {
 
